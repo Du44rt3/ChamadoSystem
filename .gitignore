@@ -1,0 +1,49 @@
+# Arquivos de configuração sensíveis
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+error.log
+access.log
+
+# Cache
+cache/
+tmp/
+temp/
+
+# Uploads (se implementado)
+uploads/
+files/
+
+# Backup do banco de dados
+*.sql
+*.dump
+backup/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node modules (se usar)
+node_modules/
+
+# Vendor (se usar Composer)
+vendor/
+
+# Arquivos temporários do PHP
+*.tmp
+.phpunit.cache
+
+# Scripts de migração sensíveis (após uso)
+migrate_passwords.php

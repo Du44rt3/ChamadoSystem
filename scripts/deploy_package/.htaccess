@@ -1,0 +1,20 @@
+# Configuracoes de Seguranca para Producao
+
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevenir listagem de diretorios
+Options -Indexes
+
+# Proteger arquivos sensíveis
+<FilesMatch "\.(log|bak|backup|old)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
