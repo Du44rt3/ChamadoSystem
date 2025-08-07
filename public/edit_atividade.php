@@ -5,7 +5,19 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 date_default_timezone_set('America/Sao_Paulo');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+// Incluir classes de segurança
+include_once '../src/SecurityHelper.php';
+
+try {
+    // Verificar se é requisição POST
+    SecurityHelper::requirePOST();
+    
+    // Validar token CSRF
+    $csrf_token = SecurityHelper::getPostValue('csrf_token');
+    if (!SecurityHelper::validateCSRFToken($csrf_token)) {
+        throw new Exception('Token CSRF inválido');
+    }
+    
     include_once '../src/DB.php';
     include_once '../src/ChamadoHistorico.php';
     
@@ -13,34 +25,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $db = $database->getConnection();
     $historico = new ChamadoHistorico($db);
     
-    $atividade_id = $_POST['atividade_id'] ?? '';
-    $chamado_id = $_POST['chamado_id'] ?? '';
-    $atividade = trim($_POST['atividade'] ?? '');
-    $usuario = trim($_POST['usuario'] ?? '');
-    $data_atividade = $_POST['data_atividade'] ?? '';
+    // Validar e sanitizar entradas
+    $atividade_id = SecurityHelper::validateId(SecurityHelper::getPostValue('atividade_id'));
+    $chamado_id = SecurityHelper::validateId(SecurityHelper::getPostValue('chamado_id'));
+    $atividade = SecurityHelper::validateText(SecurityHelper::getPostValue('atividade'), 2000, true);
+    $usuario = SecurityHelper::validateText(SecurityHelper::getPostValue('usuario'), 100, true);
+    $data_atividade = SecurityHelper::validateDateTime(SecurityHelper::getPostValue('data_atividade'));
     
-    // Aceitar tanto formato 'Y-m-d\TH:i' quanto 'Y-m-d H:i:s'
-    if (!empty($data_atividade)) {
-        if (strpos($data_atividade, 'T') !== false) {
-            $data_mysql = date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $data_atividade)));
-        } else {
-            $data_mysql = date('Y-m-d H:i:s', strtotime($data_atividade));
-        }
+    if ($historico->atualizarAtividade($atividade_id, $atividade, $data_atividade, $usuario)) {
+        header("Location: view.php?id=" . $chamado_id . "&success=2");
     } else {
-        $data_mysql = '';
+        header("Location: view.php?id=" . $chamado_id . "&error=3");
     }
     
-    if (!empty($atividade) && !empty($usuario) && !empty($data_atividade) && $atividade_id != '') {
-        if ($historico->atualizarAtividade($atividade_id, $atividade, $data_mysql, $usuario)) {
-            header("Location: view.php?id=" . $chamado_id . "&success=2");
-        } else {
-            header("Location: view.php?id=" . $chamado_id . "&error=3");
-        }
-    } else {
-        header("Location: view.php?id=" . $chamado_id . "&error=2");
-    }
-} else {
-    header("Location: index.php");
+} catch (InvalidArgumentException $e) {
+    // Erro de validação
+    $chamado_id = SecurityHelper::getPostValue('chamado_id', '1');
+    header("Location: view.php?id=" . $chamado_id . "&error=2");
+} catch (Exception $e) {
+    // Erro de segurança
+    header("Location: index.php?error=security");
 }
 exit();
 ?>

@@ -108,5 +108,5 @@ if (isset($_GET['download_test'])) {
     }
 }
 
-echo "<p><a href='backup_manager.php'>Voltar para Backup Manager</a></p>";
+echo "<p><a href='../public/backup_manager.php'>Voltar para Backup Manager</a></p>";
 ?>

@@ -458,7 +458,7 @@ foreach ($_SERVER as $key => $value) {
     <!-- Custom Dev Header -->
     <div class="dev-header">
         <div class="dev-nav">
-            <a href="dev_area.php" class="dev-brand">
+            <a href="../public/dev_area.php" class="dev-brand">
                 <img src="../public/images/logo-eluss.png" alt="ELUS Logo" class="dev-logo">
                 <span class="dev-brand-text">Debug Session</span>
                 <span class="dev-badge">DEV</span>
@@ -466,7 +466,7 @@ foreach ($_SERVER as $key => $value) {
             
             <div class="dev-user">
                 <span class="dev-user-name"><?php echo htmlspecialchars($current_user['nome']); ?></span>
-                <a href="dev_area.php" class="dev-exit">
+                <a href="../public/dev_area.php" class="dev-exit">
                     <i class="fas fa-arrow-left me-2"></i>Back to Dev
                 </a>
             </div>

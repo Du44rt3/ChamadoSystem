@@ -78,6 +78,9 @@ $page_subtitle = "Anexar imagens ao chamado";
 </head>
 <body>
     <?php 
+    // Definir variáveis globais para o header
+    global $auth, $current_user;
+    
     // Incluir header moderno
     require_once '../src/header.php'; 
     ?>

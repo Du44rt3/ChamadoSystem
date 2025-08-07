@@ -8,6 +8,12 @@ class ChamadoHistorico {
     
     // Adicionar uma nova atividade ao histórico
     public function adicionarAtividade($chamado_id, $atividade, $usuario = 'Sistema', $data_atividade = null) {
+        // Verificar se o chamado existe antes de tentar inserir
+        if (!$this->chamadoExiste($chamado_id)) {
+            error_log("Tentativa de inserir histórico para chamado inexistente: ID $chamado_id");
+            return false;
+        }
+        
         if ($data_atividade === null) {
             $sql = "INSERT INTO chamado_historico (chamado_id, atividade, usuario) VALUES (?, ?, ?)";
             $stmt = $this->db->prepare($sql);
@@ -17,6 +23,14 @@ class ChamadoHistorico {
             $stmt = $this->db->prepare($sql);
             return $stmt->execute([$chamado_id, $atividade, $usuario, $data_atividade]);
         }
+    }
+    
+    // Verificar se um chamado existe
+    private function chamadoExiste($chamado_id) {
+        $sql = "SELECT COUNT(*) FROM chamados WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$chamado_id]);
+        return $stmt->fetchColumn() > 0;
     }
 
     // Verificar se já existe atividade igual para evitar duplicidade
@@ -45,7 +59,7 @@ class ChamadoHistorico {
     
     // Buscar últimas atividades (para dashboard)
     public function buscarUltimasAtividades($limite = 10) {
-        $sql = "SELECT h.*, c.titulo as chamado_titulo 
+        $sql = "SELECT h.*, c.codigo_chamado as chamado_titulo 
                 FROM chamado_historico h 
                 LEFT JOIN chamados c ON h.chamado_id = c.id 
                 ORDER BY h.data_atividade DESC 

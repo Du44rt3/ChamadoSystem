@@ -17,6 +17,9 @@ $page_subtitle = "Alterar informações do chamado";
 </head>
 <body>
     <?php 
+    // Definir variáveis globais para o header
+    global $auth, $current_user;
+    
     // Incluir header moderno
     require_once '../src/header.php'; 
     ?>
@@ -39,7 +42,14 @@ $page_subtitle = "Alterar informações do chamado";
         // Tratamento de requisições AJAX
         if(isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             $chamado->id = $id;
-            $chamado->readOne();
+            if (!$chamado->readOne()) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Chamado não encontrado'
+                ]);
+                exit;
+            }
             
             header('Content-Type: application/json');
             echo json_encode([
@@ -53,7 +63,10 @@ $page_subtitle = "Alterar informações do chamado";
         if(isset($_POST['editar_prazo']) && $_POST['editar_prazo'] == '1') {
             try {
                 $chamado->id = $_POST['id'];
-                $chamado->readOne();
+                if (!$chamado->readOne()) {
+                    header('Location: index.php?error=chamado_nao_encontrado');
+                    exit;
+                }
                 
                 $nova_data_limite = $_POST['data_limite_sla'];
                 
@@ -109,7 +122,10 @@ $page_subtitle = "Alterar informações do chamado";
         }
 
         $chamado->id = $id;
-        $chamado->readOne();
+        if (!$chamado->readOne()) {
+            header('Location: index.php?error=chamado_nao_encontrado');
+            exit;
+        }
         
         // Guardar valores originais para comparação
         $nome_colaborador_original = $chamado->nome_colaborador;

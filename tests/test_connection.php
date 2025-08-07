@@ -82,5 +82,5 @@ try {
 }
 
 echo "<hr>";
-echo "<p><a href='index.php'>← Voltar ao Sistema</a></p>";
+echo "<p><a href='../public/index.php'>← Voltar ao Sistema</a></p>";
 ?>

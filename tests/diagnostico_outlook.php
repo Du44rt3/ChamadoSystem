@@ -97,7 +97,7 @@ $template = $emailTemplate->templateAbertura($chamado_teste);
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="fas fa-stethoscope me-2"></i>Diagnóstico Outlook</h2>
-                    <a href="index.php" class="btn btn-secondary">
+                    <a href="../public/index.php" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Voltar
                     </a>
                 </div>

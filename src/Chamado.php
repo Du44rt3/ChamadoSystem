@@ -1,7 +1,10 @@
 <?php
 
+require_once 'CacheManager.php';
+
 class Chamado {
     private $conn;
+    private $cache;
     private $table_name = "chamados";
 
     public $id;
@@ -20,47 +23,78 @@ class Chamado {
 
     public function __construct($db){
         $this->conn = $db;
+        $this->cache = new CacheManager();
     }
 
     function create(){
-        // Gerar código do chamado automaticamente
-        $this->codigo_chamado = $this->generateCodigoChamado($this->nome_projeto);
-        
-        // Calcular SLA baseado na gravidade
-        $data_limite_sla = $this->calcularSLA($this->gravidade);
-        
-        $query = "INSERT INTO " . $this->table_name . " SET codigo_chamado=:codigo_chamado, nome_colaborador=:nome_colaborador, email=:email, setor=:setor, descricao_problema=:descricao_problema, nome_projeto=:nome_projeto, gravidade=:gravidade, data_limite_sla=:data_limite_sla";
+        try {
+            // Gerar código do chamado automaticamente com proteção contra race condition
+            $this->codigo_chamado = $this->generateCodigoChamado($this->nome_projeto);
+            
+            // Iniciar transação para a inserção
+            $this->conn->beginTransaction();
+            
+            // Calcular SLA baseado na gravidade
+            $data_limite_sla = $this->calcularSLA($this->gravidade);
+            
+            $query = "INSERT INTO " . $this->table_name . " SET codigo_chamado=:codigo_chamado, nome_colaborador=:nome_colaborador, email=:email, setor=:setor, descricao_problema=:descricao_problema, nome_projeto=:nome_projeto, gravidade=:gravidade, data_limite_sla=:data_limite_sla";
 
-        $stmt = $this->conn->prepare($query);
+            $stmt = $this->conn->prepare($query);
 
-        $this->codigo_chamado=htmlspecialchars(strip_tags($this->codigo_chamado));
-        $this->nome_colaborador=htmlspecialchars(strip_tags($this->nome_colaborador));
-        $this->email=htmlspecialchars(strip_tags($this->email));
-        $this->setor=htmlspecialchars(strip_tags($this->setor));
-        $this->descricao_problema=htmlspecialchars(strip_tags($this->descricao_problema));
-        $this->nome_projeto=htmlspecialchars(strip_tags($this->nome_projeto));
-        $this->gravidade=htmlspecialchars(strip_tags($this->gravidade));
+            $this->codigo_chamado=htmlspecialchars(strip_tags($this->codigo_chamado));
+            $this->nome_colaborador=htmlspecialchars(strip_tags($this->nome_colaborador));
+            $this->email=htmlspecialchars(strip_tags($this->email));
+            $this->setor=htmlspecialchars(strip_tags($this->setor));
+            $this->descricao_problema=htmlspecialchars(strip_tags($this->descricao_problema));
+            $this->nome_projeto=htmlspecialchars(strip_tags($this->nome_projeto));
+            $this->gravidade=htmlspecialchars(strip_tags($this->gravidade));
 
-        $stmt->bindParam(":codigo_chamado", $this->codigo_chamado);
-        $stmt->bindParam(":nome_colaborador", $this->nome_colaborador);
-        $stmt->bindParam(":email", $this->email);
-        $stmt->bindParam(":setor", $this->setor);
-        $stmt->bindParam(":descricao_problema", $this->descricao_problema);
-        $stmt->bindParam(":nome_projeto", $this->nome_projeto);
-        $stmt->bindParam(":gravidade", $this->gravidade);
-        $stmt->bindParam(":data_limite_sla", $data_limite_sla);
+            $stmt->bindParam(":codigo_chamado", $this->codigo_chamado);
+            $stmt->bindParam(":nome_colaborador", $this->nome_colaborador);
+            $stmt->bindParam(":email", $this->email);
+            $stmt->bindParam(":setor", $this->setor);
+            $stmt->bindParam(":descricao_problema", $this->descricao_problema);
+            $stmt->bindParam(":nome_projeto", $this->nome_projeto);
+            $stmt->bindParam(":gravidade", $this->gravidade);
+            $stmt->bindParam(":data_limite_sla", $data_limite_sla);
 
-        if($stmt->execute()){
-            return true;
+            if($stmt->execute()){
+                // Obter o ID antes do commit
+                $this->id = $this->conn->lastInsertId();
+                
+                // Confirmar transação
+                $this->conn->commit();
+                
+                // Limpar cache relacionado após criação
+                $this->invalidateCache();
+                return $this->id; // Retornar o ID ao invés de true
+            }
+            
+            // Se chegou aqui, houve erro
+            $this->conn->rollback();
+            return false;
+            
+        } catch (Exception $e) {
+            // Em caso de erro, reverter transação se estiver ativa
+            if($this->conn->inTransaction()) {
+                $this->conn->rollback();
+            }
+            error_log("Erro ao criar chamado: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
     function read(){
-        $query = "SELECT * FROM " . $this->table_name . " ORDER BY data_abertura DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
+        $cache_key = 'chamados_all_' . date('Y-m-d-H-i'); // Cache por minuto
+        
+        return $this->cache->rememberQuery($cache_key, function() {
+            $query = "SELECT id, codigo_chamado, nome_colaborador, email, setor, descricao_problema, 
+                             nome_projeto, data_abertura, gravidade, status, data_limite_sla, data_fechamento 
+                      FROM " . $this->table_name . " ORDER BY data_abertura DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }, 300); // Cache por 5 minutos apenas
     }
 
     function readOne(){
@@ -69,6 +103,11 @@ class Chamado {
         $stmt->bindParam(1, $this->id);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Verificar se encontrou o registro
+        if (!$row) {
+            return false;
+        }
 
         $this->nome_colaborador = $row["nome_colaborador"];
         $this->codigo_chamado = $row["codigo_chamado"];
@@ -82,6 +121,8 @@ class Chamado {
         $this->solucao = $row["solucao"];
         $this->data_limite_sla = $row["data_limite_sla"];
         $this->data_fechamento = $row["data_fechamento"];
+        
+        return true;
     }
 
     function update(){
@@ -163,6 +204,8 @@ class Chamado {
         }
 
         if($stmt->execute()){
+            // Limpar cache relacionado após atualização
+            $this->invalidateCache();
             return true;
         }
         return false;
@@ -175,89 +218,187 @@ class Chamado {
         $stmt->bindParam(1, $this->id);
 
         if($stmt->execute()){
+            // Limpar cache relacionado após exclusão
+            $this->invalidateCache();
             return true;
         }
         return false;
     }
+    
+    /**
+     * Invalida cache relacionado aos chamados
+     */
+    private function invalidateCache() {
+        $patterns = [
+            'chamados_all_',
+            'chamados_status_',
+            'search_',
+            'search_status_',
+            'stats_'
+        ];
+        
+        foreach ($patterns as $pattern) {
+            // Limpar cache das últimas 24 horas (por minuto agora)
+            for ($i = 0; $i < 1440; $i++) { // 1440 minutos = 24 horas
+                $timestamp = date('Y-m-d-H-i', strtotime("-{$i} minutes"));
+                $this->cache->delete($pattern . $timestamp);
+            }
+        }
+    }
 
     function readByStatus($status){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE status = ? ORDER BY data_abertura DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $status);
-        $stmt->execute();
-        return $stmt;
+        $cache_key = 'chamados_status_' . $status . '_' . date('Y-m-d-H');
+        
+        return $this->cache->rememberQuery($cache_key, function() use ($status) {
+            $query = "SELECT id, codigo_chamado, nome_colaborador, email, setor, descricao_problema, 
+                             nome_projeto, data_abertura, gravidade, status, data_limite_sla, data_fechamento 
+                      FROM " . $this->table_name . " WHERE status = ? ORDER BY data_abertura DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$status]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }, 1800); // Cache por 30 minutos
     }
 
     function generateCodigoChamado($nome_projeto = ""){
-        $ano = date('y'); // 25 para 2025
-        $mes = date('m'); // 07 para julho
-        $dia = date('d'); // 17 para dia 17
+        $max_tentativas = 10;
+        $tentativa = 0;
         
-        $data_base = $ano . $mes . $dia;
-        
-        // Buscar quantos chamados já foram criados hoje para gerar contador único
-        $query = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE DATE(data_abertura) = CURDATE()";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $contador = $row['total'] + 1;
-        
-        // Garantir que o código seja único verificando se já existe
-        $codigo_base = "";
-        $tentativas = 0;
-        do {
-            $codigo_base = "FAC-TI-" . $data_base . "." . ($contador + $tentativas) . "_" . strtolower(str_replace(' ', '_', $nome_projeto));
+        while($tentativa < $max_tentativas) {
+            $tentativa++;
             
-            // Verificar se já existe um código igual
-            $query_check = "SELECT id FROM " . $this->table_name . " WHERE codigo_chamado = :codigo";
-            $stmt_check = $this->conn->prepare($query_check);
-            $stmt_check->bindParam(':codigo', $codigo_base);
-            $stmt_check->execute();
-            
-            if($stmt_check->rowCount() == 0) {
-                break; // Código único encontrado
+            try {
+                $ano = date('y'); // 25 para 2025
+                $mes = date('m'); // 08 para agosto (com zero à esquerda)
+                $dia = date('d'); // 07 para dia 07 (com zero à esquerda)
+                
+                $data_base = $ano . $mes . $dia;
+                $prefixo_base = "FAC-TI-" . $data_base . ".";
+                
+                // Usar GET_LOCK para evitar race conditions entre processos
+                $lock_name = "codigo_chamado_" . $data_base;
+                $lock_timeout = 10; // 10 segundos
+                
+                $get_lock = $this->conn->prepare("SELECT GET_LOCK(?, ?)");
+                $get_lock->execute([$lock_name, $lock_timeout]);
+                $lock_result = $get_lock->fetchColumn();
+                
+                if($lock_result != 1) {
+                    // Se não conseguiu o lock, aguardar e tentar novamente
+                    usleep(rand(50000, 200000)); // 50-200ms
+                    continue;
+                }
+                
+                try {
+                    // Buscar todos os códigos do dia
+                    $query = "SELECT codigo_chamado FROM " . $this->table_name . " 
+                              WHERE codigo_chamado LIKE ? 
+                              AND DATE(data_abertura) = CURDATE()";
+                    $stmt = $this->conn->prepare($query);
+                    $pattern = $prefixo_base . "%";
+                    $stmt->execute([$pattern]);
+                    $codigos_existentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    
+                    // Extrair números sequenciais
+                    $numeros_usados = [];
+                    foreach($codigos_existentes as $codigo) {
+                        $resto = str_replace($prefixo_base, '', $codigo);
+                        $partes = explode('_', $resto);
+                        if(count($partes) > 0 && is_numeric($partes[0])) {
+                            $numeros_usados[] = (int)$partes[0];
+                        }
+                    }
+                    
+                    // Encontrar próximo número
+                    $contador = 1;
+                    while(in_array($contador, $numeros_usados)) {
+                        $contador++;
+                    }
+                    
+                    // Adicionar um pouco de aleatoriedade na tentativa para evitar colisões
+                    if($tentativa > 1) {
+                        $contador += $tentativa - 1;
+                    }
+                    
+                    // Gerar código final
+                    $nome_projeto_limpo = strtolower(str_replace([' ', '-', '.', '/', '\\'], '_', $nome_projeto));
+                    $nome_projeto_limpo = preg_replace('/[^a-z0-9_]/', '', $nome_projeto_limpo);
+                    $codigo_final = $prefixo_base . $contador . "_" . $nome_projeto_limpo;
+                    
+                    // Verificação final
+                    $check_query = "SELECT COUNT(*) FROM " . $this->table_name . " WHERE codigo_chamado = ?";
+                    $check_stmt = $this->conn->prepare($check_query);
+                    $check_stmt->execute([$codigo_final]);
+                    
+                    if($check_stmt->fetchColumn() == 0) {
+                        // Código único encontrado
+                        return $codigo_final;
+                    }
+                    
+                } finally {
+                    // Sempre liberar o lock
+                    $release_lock = $this->conn->prepare("SELECT RELEASE_LOCK(?)");
+                    $release_lock->execute([$lock_name]);
+                }
+                
+            } catch(Exception $e) {
+                error_log("Erro na tentativa $tentativa de gerar código: " . $e->getMessage());
+                usleep(rand(100000, 300000)); // 100-300ms
             }
-            
-            $tentativas++;
-        } while($tentativas < 100); // Limite de segurança
+        }
         
-        return $codigo_base;
+        // Se chegou aqui, todas as tentativas falharam - usar timestamp para garantir unicidade
+        $timestamp = time() . substr(microtime(), 2, 6);
+        $nome_projeto_limpo = strtolower(str_replace([' ', '-', '.', '/', '\\'], '_', $nome_projeto));
+        $nome_projeto_limpo = preg_replace('/[^a-z0-9_]/', '', $nome_projeto_limpo);
+        return "FAC-TI-" . date('ymd') . "." . $timestamp . "_" . $nome_projeto_limpo;
     }
 
     function search($termo_pesquisa){
-        $query = "SELECT * FROM " . $this->table_name . " 
-                  WHERE nome_colaborador LIKE :termo 
-                  OR email LIKE :termo 
-                  OR setor LIKE :termo 
-                  OR codigo_chamado LIKE :termo 
-                  OR descricao_problema LIKE :termo 
-                  OR nome_projeto LIKE :termo 
-                  ORDER BY data_abertura DESC";
+        $cache_key = 'search_' . md5($termo_pesquisa) . '_' . date('Y-m-d-H');
         
-        $stmt = $this->conn->prepare($query);
-        $termo_pesquisa = "%" . htmlspecialchars(strip_tags($termo_pesquisa)) . "%";
-        $stmt->bindParam(':termo', $termo_pesquisa);
-        $stmt->execute();
-        return $stmt;
+        return $this->cache->rememberQuery($cache_key, function() use ($termo_pesquisa) {
+            $query = "SELECT id, codigo_chamado, nome_colaborador, email, setor, descricao_problema, 
+                             nome_projeto, data_abertura, gravidade, status, data_limite_sla, data_fechamento 
+                      FROM " . $this->table_name . " 
+                      WHERE nome_colaborador LIKE :termo 
+                      OR email LIKE :termo 
+                      OR setor LIKE :termo 
+                      OR codigo_chamado LIKE :termo 
+                      OR descricao_problema LIKE :termo 
+                      OR nome_projeto LIKE :termo 
+                      ORDER BY data_abertura DESC";
+            
+            $stmt = $this->conn->prepare($query);
+            $termo_pesquisa = "%" . htmlspecialchars(strip_tags($termo_pesquisa)) . "%";
+            $stmt->bindParam(':termo', $termo_pesquisa);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }, 1800); // Cache por 30 minutos
     }
 
     function searchByStatus($termo_pesquisa, $status){
-        $query = "SELECT * FROM " . $this->table_name . " 
-                  WHERE status = :status 
-                  AND (nome_colaborador LIKE :termo 
-                       OR email LIKE :termo 
-                       OR setor LIKE :termo 
-                       OR codigo_chamado LIKE :termo 
-                       OR descricao_problema LIKE :termo 
-                       OR nome_projeto LIKE :termo) 
-                  ORDER BY data_abertura DESC";
+        $cache_key = 'search_status_' . $status . '_' . md5($termo_pesquisa) . '_' . date('Y-m-d-H');
         
-        $stmt = $this->conn->prepare($query);
-        $termo_pesquisa = "%" . htmlspecialchars(strip_tags($termo_pesquisa)) . "%";
-        $stmt->bindParam(':termo', $termo_pesquisa);
-        $stmt->bindParam(':status', $status);
-        $stmt->execute();
-        return $stmt;
+        return $this->cache->rememberQuery($cache_key, function() use ($termo_pesquisa, $status) {
+            $query = "SELECT id, codigo_chamado, nome_colaborador, email, setor, descricao_problema, 
+                             nome_projeto, data_abertura, gravidade, status, data_limite_sla, data_fechamento 
+                      FROM " . $this->table_name . " 
+                      WHERE status = :status 
+                      AND (nome_colaborador LIKE :termo 
+                           OR email LIKE :termo 
+                           OR setor LIKE :termo 
+                           OR codigo_chamado LIKE :termo 
+                           OR descricao_problema LIKE :termo 
+                           OR nome_projeto LIKE :termo) 
+                      ORDER BY data_abertura DESC";
+            
+            $stmt = $this->conn->prepare($query);
+            $termo_pesquisa = "%" . htmlspecialchars(strip_tags($termo_pesquisa)) . "%";
+            $stmt->bindParam(':termo', $termo_pesquisa);
+            $stmt->bindParam(':status', $status);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }, 1800); // Cache por 30 minutos
     }
     
     function calcularSLA($gravidade) {

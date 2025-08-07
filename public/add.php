@@ -21,6 +21,9 @@ $page_subtitle = "Criar nova solicitação";
 </head>
 <body>
     <?php 
+    // Definir variáveis globais para o header
+    global $auth, $current_user;
+    
     // Incluir header moderno
     require_once '../src/header.php'; 
     ?>
@@ -29,7 +32,7 @@ $page_subtitle = "Criar nova solicitação";
         <h1>Novo Chamado</h1>
 
         <?php
-        if($_POST){
+            if($_POST){
             include_once '../src/DB.php';
             include_once '../src/Chamado.php';
             include_once '../src/ChamadoHistorico.php';
@@ -48,12 +51,39 @@ $page_subtitle = "Criar nova solicitação";
             $chamado->nome_projeto = $_POST['nome_projeto'];
             $chamado->gravidade = $_POST['gravidade'];
 
-            if($chamado->create()){
-                $novo_id = $db->lastInsertId();
+            // Tentar criar chamado com retry em caso de código duplicado
+            $novo_id = false;
+            $tentativas = 0;
+            $max_tentativas = 5;
+            
+            while($novo_id === false && $tentativas < $max_tentativas) {
+                $tentativas++;
+                $novo_id = $chamado->create();
                 
-                // Adicionar atividade de abertura explicitamente no histórico
+                // Se falhou, aguardar um pouco antes da próxima tentativa
+                if($novo_id === false && $tentativas < $max_tentativas) {
+                    usleep(100000 * $tentativas); // 100ms, 200ms, 300ms, etc.
+                }
+            }
+            
+            if($novo_id):
+                // Adicionar atividade de abertura no histórico (o trigger já deve fazer isso, mas vamos garantir)
                 date_default_timezone_set('America/Sao_Paulo');
-                $historico->adicionarAtividade($novo_id, 'Abertura do chamado', 'Sistema', date('Y-m-d H:i:s'));
+                
+                // Verificar se já existe atividade de abertura (trigger pode ter criado)
+                $historico_existente = $historico->buscarHistorico($novo_id);
+                $tem_abertura = false;
+                foreach($historico_existente as $atividade) {
+                    if(strpos($atividade['atividade'], 'Abertura') !== false) {
+                        $tem_abertura = true;
+                        break;
+                    }
+                }
+                
+                // Se não tem atividade de abertura, criar uma
+                if(!$tem_abertura) {
+                    $historico->adicionarAtividade($novo_id, 'Abertura do chamado', 'Sistema', date('Y-m-d H:i:s'));
+                }
                 
                 // Processar uploads de imagens se houver
                 $uploads_success = true;
@@ -88,9 +118,11 @@ $page_subtitle = "Criar nova solicitação";
                 
                 echo "<a href='view.php?id=$novo_id' class='btn btn-primary'>Ver Chamado</a> ";
                 echo "<a href='index.php' class='btn btn-secondary'>Voltar para lista</a>";
-            } else {
-                echo "<div class='alert alert-danger'>Erro ao criar chamado.</div>";
-            }
+            else:
+                echo "<div class='alert alert-danger'>Erro ao criar chamado após $tentativas tentativas. Tente novamente em alguns segundos.</div>";
+                echo "<a href='add.php' class='btn btn-primary'>Tentar Novamente</a> ";
+                echo "<a href='index.php' class='btn btn-secondary'>Voltar para lista</a>";
+            endif;
         } else {
         ?>
 

@@ -39,12 +39,12 @@ if ($result['total'] > 0) {
         echo "<td>" . $chamado['codigo_chamado'] . "</td>";
         echo "<td>" . $chamado['status'] . "</td>";
         echo "<td>" . ($chamado['data_limite_sla'] ? date('d/m/Y H:i', strtotime($chamado['data_limite_sla'])) : 'Não definido') . "</td>";
-        echo "<td><a href='edit.php?id=" . $chamado['id'] . "' target='_blank'>Editar</a></td>";
+        echo "<td><a href='../public/edit.php?id=" . $chamado['id'] . "' target='_blank'>Editar</a></td>";
         echo "</tr>";
     }
     echo "</table>";
 } else {
-    echo "<p style='color: orange;'>Nenhum chamado encontrado. <a href='add.php'>Criar um chamado de teste</a></p>";
+    echo "<p style='color: orange;'>Nenhum chamado encontrado. <a href='../public/add.php'>Criar um chamado de teste</a></p>";
 }
 
 // 2. Verificar histórico de atividades
@@ -109,5 +109,5 @@ echo "<li><strong>Histórico completo:</strong> Todas as mudanças são registra
 echo "<li><strong>Interface melhorada:</strong> Botões, alertas e feedback visual</li>";
 echo "</ul>";
 
-echo "<p><a href='index.php'>← Voltar para Lista de Chamados</a></p>";
+echo "<p><a href='../public/index.php'>← Voltar para Lista de Chamados</a></p>";
 ?>

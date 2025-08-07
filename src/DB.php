@@ -1,4 +1,6 @@
 <?php
+// Incluir configurações
+require_once __DIR__ . '/../config/config.php';
 
 class DB {
     private $host;
@@ -21,6 +23,9 @@ class DB {
             $this->conn = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->username, $this->password);
             $this->conn->exec('set names utf8');
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Configurar timezone do MySQL para coincidir com o PHP (America/Sao_Paulo = -03:00)
+            $this->conn->exec("SET time_zone = '-03:00'");
         }catch(PDOException $exception){
             if (defined('APP_DEBUG') && APP_DEBUG) {
                 echo 'Connection error: ' . $exception->getMessage();

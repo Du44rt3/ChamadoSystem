@@ -43,6 +43,9 @@ define('SESSION_SECURE', EnvLoader::get('SESSION_SECURE', 'false') === 'true');
 define('SESSION_HTTPONLY', EnvLoader::get('SESSION_HTTPONLY', 'true') === 'true');
 define('SESSION_SAMESITE', EnvLoader::get('SESSION_SAMESITE', 'Strict'));
 
+// Configurações de timezone
+date_default_timezone_set('America/Sao_Paulo');
+
 // Configurações de erro (apenas em desenvolvimento)
 if (APP_DEBUG && APP_ENV === 'development') {
     error_reporting(E_ALL);

@@ -1,0 +1,398 @@
+/* ===================================================================
+   PROGRESSIVE DISCLOSURE UI - CSS OTIMIZADO
+   Resolve problemas de sobrecarga visual e performance
+   =================================================================== */
+
+/* Reset e base otimizada */
+.progressive-filters,
+.chamado-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===================================================================
+   CARDS COM PROGRESSIVE DISCLOSURE
+   =================================================================== */
+
+.chamado-card {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chamado-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chamado-card.border-warning {
+    border-color: #ffc107;
+}
+
+.chamado-card.border-info {
+    border-color: #0dcaf0;
+}
+
+.chamado-card.border-success {
+    border-color: #198754;
+}
+
+/* Header do card - informações primárias */
+.chamado-header-main .codigo-chamado {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.chamado-header-main .colaborador-nome {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+.chamado-actions .toggle-details {
+    border: none;
+    background: transparent;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.chamado-actions .toggle-details:hover {
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+/* Informações essenciais - sempre visíveis */
+.essential-info .problem-summary {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    color: #6c757d;
+    cursor: help;
+}
+
+.meta-info {
+    font-size: 0.8rem;
+}
+
+.sla-indicator {
+    font-size: 1.1rem;
+    cursor: help;
+}
+
+/* Detalhes expandíveis */
+.detailed-info {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.detailed-info.show {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.detailed-info.collapsing {
+    transition: all 0.3s ease-out;
+}
+
+/* Informações de nível 2 */
+.level-2-info {
+    animation: slideIn 0.3s ease-out;
+}
+
+.level-2-info .toggle-advanced {
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: #6c757d;
+    border: none;
+    background: none;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.level-2-info .toggle-advanced:hover {
+    color: #0d6efd;
+}
+
+/* Informações avançadas - nível 3 */
+.advanced-info {
+    transition: all 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.advanced-info.show {
+    max-height: 300px;
+    opacity: 1;
+}
+
+/* ===================================================================
+   FILTROS PROGRESSIVOS
+   =================================================================== */
+
+.progressive-filters {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.basic-filters {
+    position: relative;
+}
+
+.toggle-advanced-filters {
+    transition: all 0.2s ease;
+}
+
+.toggle-advanced-filters:hover {
+    transform: scale(1.05);
+}
+
+.advanced-filters {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.advanced-filters.show {
+    max-height: 400px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+/* ===================================================================
+   LOADING STATES E SKELETONS
+   =================================================================== */
+
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ===================================================================
+   ANIMAÇÕES E TRANSIÇÕES
+   =================================================================== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* ===================================================================
+   BADGES E INDICADORES
+   =================================================================== */
+
+.badge {
+    font-size: 0.7rem;
+    padding: 0.25em 0.6em;
+    border-radius: 4px;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+/* ===================================================================
+   RESPONSIVE DESIGN
+   =================================================================== */
+
+@media (max-width: 768px) {
+    .progressive-filters {
+        padding: 1rem;
+    }
+
+    .basic-filters .col-md-4,
+    .basic-filters .col-md-3,
+    .basic-filters .col-md-2 {
+        margin-bottom: 0.5rem;
+    }
+
+    .chamado-card {
+        margin-bottom: 1rem;
+    }
+
+    .chamado-header-main .codigo-chamado {
+        font-size: 0.8rem;
+    }
+
+    .essential-info .problem-summary {
+        font-size: 0.85rem;
+    }
+
+    .detailed-info.show {
+        max-height: 600px;
+        /* Mais espaço em mobile */
+    }
+}
+
+@media (max-width: 576px) {
+    .progressive-filters {
+        padding: 0.75rem;
+    }
+
+    .chamado-actions .toggle-details {
+        padding: 2px 6px;
+        font-size: 0.9rem;
+    }
+
+    .meta-info {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .meta-info .sla-indicator {
+        margin-top: 0.25rem;
+    }
+}
+
+/* ===================================================================
+   UTILITÁRIOS DE PERFORMANCE
+   =================================================================== */
+
+/* Reduzir repaints durante animações */
+.chamado-card,
+.detailed-info,
+.advanced-filters {
+    will-change: transform, opacity;
+}
+
+/* Otimização para animações suaves */
+@media (prefers-reduced-motion: reduce) {
+
+    .chamado-card,
+    .detailed-info,
+    .advanced-filters,
+    .toggle-details,
+    .toggle-advanced-filters {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* ===================================================================
+   DARK MODE SUPPORT (futuro)
+   =================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    .progressive-filters {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+
+    .chamado-card {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .loading-skeleton {
+        background: linear-gradient(90deg, #4a5568 25%, #2d3748 50%, #4a5568 75%);
+        background-size: 200% 100%;
+    }
+}
+
+/* ===================================================================
+   ESTADOS DE FOCO E ACESSIBILIDADE
+   =================================================================== */
+
+.toggle-details:focus,
+.toggle-advanced:focus,
+.toggle-advanced-filters:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Indicadores visuais para teclado */
+.chamado-card:focus-within {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+/* Estados de loading */
+.chamado-card.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.chamado-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Otimizações de performance críticas */
+.progressive-disclosure-container {
+    contain: layout style paint;
+    transform: translateZ(0);
+    /* Força aceleração de hardware */
+}
+
+/* Lazy loading para imagens */
+img[data-src] {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+img[data-src].loaded {
+    opacity: 1;
+}

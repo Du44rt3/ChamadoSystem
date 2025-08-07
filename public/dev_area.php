@@ -10,6 +10,10 @@ require_once '../src/AuthMiddleware.php';
 // Verificar se tem acesso de desenvolvedor
 $auth->requireDeveloper();
 
+// Configurações da página
+$page_title = "Dev Area";
+$page_subtitle = "Área de Desenvolvimento - ELUS Facilities";
+
 // Estatísticas do sistema
 $query = "SELECT status, COUNT(*) as total FROM chamados GROUP BY status";
 $stmt = $db->prepare($query);
@@ -30,6 +34,7 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Dev Area - ELUS Facilities</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="../css/style.css?v=<?php echo time(); ?>" rel="stylesheet">
     <style>
         /* Dev Area Clean Dark Theme */
         * {
@@ -395,6 +400,13 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Dev Tools -->
         <div class="tools-grid">
             <div class="tool-card">
+                <i class="fas fa-tools tool-icon"></i>
+                <div class="tool-title">🔧 Verificar Ferramentas</div>
+                <div class="tool-desc">Verificar se todas as ferramentas estão funcionando corretamente</div>
+                <a href="../tests/verificar_dev_tools.php" class="btn-dev">Verificar Tools</a>
+            </div>
+            
+            <div class="tool-card">
                 <i class="fas fa-user-plus tool-icon"></i>
                 <div class="tool-title">Registro de Usuários</div>
                 <div class="tool-desc">Criar novos usuários do sistema com níveis de acesso apropriados</div>
@@ -440,14 +452,14 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="fas fa-plug tool-icon"></i>
                 <div class="tool-title">Teste de Conexão</div>
                 <div class="tool-desc">Verificar conexão com banco de dados e integridade</div>
-                <a href="test_connection.php" class="btn-dev">Testar Conexão</a>
+                <a href="../tests/test_connection.php" class="btn-dev">Testar Conexão</a>
             </div>
             
             <div class="tool-card">
                 <i class="fas fa-bug tool-icon"></i>
                 <div class="tool-title">Debug de Sessão</div>
                 <div class="tool-desc">Visualizar informações de sessão e debugging</div>
-                <a href="debug_session.php" class="btn-dev">Debug Session</a>
+                <a href="../tests/debug_session.php" class="btn-dev">Debug Session</a>
             </div>
             
             <div class="tool-card">

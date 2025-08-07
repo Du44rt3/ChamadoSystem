@@ -11,6 +11,21 @@ class EmailTemplate {
      * Formatar data/hora para exibição no template
      */
     private function formatarDataHora($data) {
+        if ($data instanceof DateTime) {
+            $dt = $data;
+        } else {
+            $dt = new DateTime($data);
+        }
+        
+        // Aplicar timezone do Brasil para garantir hora correta  
+        $dt->setTimezone(new DateTimeZone('America/Sao_Paulo'));
+        return $dt->format('d/m/Y H:i');
+    }
+    
+    /**
+     * Método adicional para compatibilidade
+     */
+    private function formatarDataHoraLegacy($data) {
         try {
             // Se a data já é um objeto DateTime
             if ($data instanceof DateTime) {
@@ -20,8 +35,8 @@ class EmailTemplate {
                 $dt = new DateTime($data);
             }
             
-            // Não aplicar timezone pois o MySQL já armazena no horário local
-            // $dt->setTimezone(new DateTimeZone('America/Sao_Paulo'));
+            // Aplicar timezone do Brasil para garantir hora correta
+            $dt->setTimezone(new DateTimeZone('America/Sao_Paulo'));
             
             // Retornar formatação padrão
             return $dt->format('d/m/Y \à\s H:i:s');

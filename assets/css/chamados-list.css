@@ -1,0 +1,373 @@
+/* 
+ * Estilos unificados para páginas de listagem de chamados
+ * Elimina CSS inline duplicado entre abertos.php, em_andamento.php e fechados.php
+ */
+
+/* =================================
+   TABELA COM SCROLL HORIZONTAL
+================================= */
+.table-responsive {
+    scrollbar-width: thin;
+    scrollbar-color: #6c757d #f8f9fa;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #6c757d;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #495057;
+}
+
+/* =================================
+   INDICADOR VISUAL DE SCROLL
+================================= */
+.scroll-indicator {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.table-container {
+    position: relative;
+}
+
+/* =================================
+   ESTILOS PARA SLA
+================================= */
+.sla-prazo {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+
+.sla-prazo.normal {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.sla-prazo.atencao {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.sla-prazo.critico {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* =================================
+   ANIMAÇÕES
+================================= */
+@keyframes blink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0.3;
+    }
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+/* =================================
+   CÓDIGO DO CHAMADO CLICÁVEL
+================================= */
+.codigo-chamado {
+    color: #0d6efd;
+    text-decoration: none;
+    border-bottom: 1px dotted #0d6efd;
+    transition: all 0.3s ease;
+}
+
+.codigo-chamado:hover {
+    color: #0b5ed7;
+    text-decoration: none;
+    border-bottom: 1px solid #0b5ed7;
+}
+
+/* =================================
+   CARDS DE CHAMADOS
+================================= */
+.chamado-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.chamado-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* =================================
+   STATUS BADGES
+================================= */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-aberto {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d9ff;
+}
+
+.status-em_andamento {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-fechado {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* =================================
+   GRAVIDADE
+================================= */
+.gravidade-alta {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border: 1px solid #f5c6cb;
+}
+
+.gravidade-media {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border: 1px solid #ffeaa7;
+}
+
+.gravidade-baixa {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border: 1px solid #c3e6cb;
+}
+
+/* =================================
+   BARRA DE PESQUISA
+================================= */
+.search-bar {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar .input-group {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.search-bar .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: none;
+}
+
+/* =================================
+   BOTÕES DE VISUALIZAÇÃO
+================================= */
+.view-options .btn-group .btn {
+    border-radius: 6px;
+}
+
+.view-options .btn-group .btn:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.view-options .btn-group .btn:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* =================================
+   RESPONSIVIDADE
+================================= */
+@media (max-width: 768px) {
+
+    .search-bar .col-md-10,
+    .search-bar .col-md-2 {
+        margin-bottom: 10px;
+    }
+
+    .view-options {
+        flex-wrap: wrap;
+        gap: 10px !important;
+    }
+
+    .chamado-card {
+        margin-bottom: 15px;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* =================================
+   ESTADOS DE LOADING
+================================= */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* =================================
+   MELHORIAS DE ACESSIBILIDADE
+================================= */
+.btn:focus,
+.form-control:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+.codigo-chamado:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* =================================
+   ANIMAÇÕES SUAVES
+================================= */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =================================
+   ESTILOS ESPECÍFICOS DA PÁGINA INICIAL
+================================= */
+
+/* Seção de busca modernizada */
+.search-section {
+    background: linear-gradient(135deg, var(--bs-white) 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(13, 110, 253, 0.1);
+}
+
+.search-form .input-group {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.search-form .form-control {
+    border: 1px solid #e3e6f0;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+.search-form .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.search-form .input-group-text {
+    background: var(--bs-white);
+    border: 1px solid #e3e6f0;
+    color: #0d6efd;
+}
+
+.btn-novo-chamado {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+}
+
+.btn-novo-chamado:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+}
+
+/* Filtros */
+#filters-container {
+    transition: all 0.3s ease;
+}
+
+#filters-container .card {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#show-filters-btn {
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}

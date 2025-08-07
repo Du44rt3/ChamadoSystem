@@ -14,7 +14,10 @@ $db = $database->getConnection();
 
 $chamado = new Chamado($db);
 $chamado->id = $_GET['id'];
-$chamado->readOne();
+if (!$chamado->readOne()) {
+    header('Location: index.php?error=chamado_nao_encontrado');
+    exit;
+}
 
 $historico = new ChamadoHistorico($db);
 $atividades = $historico->buscarHistoricoSemDuplicacoes($chamado->id);
