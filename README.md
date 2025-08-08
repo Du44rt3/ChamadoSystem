@@ -402,7 +402,7 @@ URL: /tests/teste_outlook_*.php
 ## 📞 Suporte e Contato
 
 ### 🆘 **Suporte Técnico**
-- **Email**: suporte@sistema.com.br
+- **Email**: renan221105@gmail.com
 - **Documentação**: `/docs/` (completa)
 - **FAQ**: Common issues e soluções
 
