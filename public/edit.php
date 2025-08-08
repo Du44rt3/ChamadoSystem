@@ -201,8 +201,22 @@ $page_subtitle = "Alterar informações do chamado";
                 }
                 
                 echo "<div class='alert alert-success'>Chamado atualizado com sucesso!</div>";
-                echo "<a href='view.php?id=$id' class='btn btn-primary'>Ver Chamado</a> ";
-                echo "<a href='index.php' class='btn btn-secondary'>Voltar para lista</a>";
+                echo "<a href='view.php?id=$id&refresh=1' class='btn btn-primary'>Ver Chamado</a> ";
+                echo "<a href='index.php?refresh=1' class='btn btn-secondary'>Voltar para lista</a>";
+                
+                // Adicionar script para limpar cache do navegador para listas de status
+                echo "<script>
+                    // Forçar reload das páginas de listagem que podem estar em cache
+                    if (window.opener) {
+                        try {
+                            window.opener.location.reload();
+                        } catch(e) {}
+                    }
+                    
+                    // Limpar sessionStorage para forçar refresh das listas
+                    sessionStorage.removeItem('chamados_cache');
+                    localStorage.removeItem('chamados_last_update');
+                </script>";
             } else {
                 echo "<div class='alert alert-danger'>Erro ao atualizar chamado.</div>";
             }

@@ -15,12 +15,6 @@ $db = $database->getConnection();
 $chamado = new Chamado($db);
 $chamado->id = $_GET['id'];
 if (!$chamado->readOne()) {
-    header("Location: index.php");
-    exit();
-}
-
-// Verificar se o chamado foi encontrado
-if (!$chamado->readOne()) {
     header('Location: index.php?error=chamado_nao_encontrado');
     exit;
 }

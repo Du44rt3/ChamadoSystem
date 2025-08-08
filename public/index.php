@@ -2,6 +2,18 @@
 // Proteção de autenticação
 require_once '../src/AuthMiddleware.php';
 
+// Verificar se foi solicitado refresh de cache
+if (isset($_GET['refresh']) && $_GET['refresh'] == '1') {
+    require_once '../src/CacheManager.php';
+    $cache = new CacheManager('../cache');
+    $cache->clear();
+    
+    // Redirecionar sem o parâmetro refresh para evitar reload desnecessário
+    $redirect_url = strtok($_SERVER["REQUEST_URI"], '?');
+    header("Location: $redirect_url");
+    exit;
+}
+
 // Incluir dependências
 require_once '../src/DB.php';
 require_once '../src/Chamado.php';

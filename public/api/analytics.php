@@ -7,19 +7,36 @@
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 
-// Verificar se a sessão está ativa e usuário logado
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Acesso não autorizado']);
-    exit;
+// Iniciar sessão se não estiver ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-require_once '../config/config.php';
-require_once '../src/analytics/AnalyticsManager.php';
+// Verificar autenticação usando o sistema padrão
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../src/DB.php';
+require_once __DIR__ . '/../../src/Auth.php';
 
 try {
+    // Inicializar autenticação
+    $database = new DB();
+    $db = $database->getConnection();
+    $auth = new Auth($db);
+
+    // Verificar se usuário está logado
+    if (!$auth->isLoggedIn()) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Usuário não autenticado',
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+        exit;
+    }
+
+    // Carregar Analytics Manager
+    require_once __DIR__ . '/../../src/analytics/AnalyticsManager.php';
+    
     $analyticsManager = new AnalyticsManager();
     
     // Obter tipo de dados solicitado

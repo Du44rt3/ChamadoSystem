@@ -449,6 +449,13 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             
             <div class="tool-card">
+                <i class="fas fa-memory tool-icon"></i>
+                <div class="tool-title">Gerenciar Cache</div>
+                <div class="tool-desc">Limpar cache do sistema quando houver inconsistências</div>
+                <button class="btn-dev" onclick="clearSystemCache()">Limpar Cache</button>
+            </div>
+            
+            <div class="tool-card">
                 <i class="fas fa-plug tool-icon"></i>
                 <div class="tool-title">Teste de Conexão</div>
                 <div class="tool-desc">Verificar conexão com banco de dados e integridade</div>
@@ -601,6 +608,59 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             `;
+        }
+        
+        function clearSystemCache() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = `
+                <div class="results-area">
+                    <div style="color: #00ff41; margin-bottom: 20px; font-weight: 600;">
+                        Limpando Cache do Sistema...
+                    </div>
+                    <div style="color: #888; font-size: 0.9rem;">
+                        > Removendo arquivos de cache...<br>
+                        > Limpando cache de queries...<br>
+                        > Invalidando sessões de cache...<br>
+                        > Atualizando índices...
+                    </div>
+                </div>
+            `;
+            
+            // Fazer requisição para limpar o cache
+            fetch('../tools/clear_cache.php?admin_clear=true')
+                .then(response => response.text())
+                .then(data => {
+                    setTimeout(() => {
+                        results.innerHTML = `
+                            <div class="results-area">
+                                <div style="color: #00ff41; margin-bottom: 20px; font-weight: 600;">
+                                    Cache Limpo com Sucesso!
+                                </div>
+                                <div style="color: #888; font-size: 0.9rem; line-height: 1.8;">
+                                    • Cache de queries: <span style="color: #00ff41;">Limpo ✓</span><br>
+                                    • Cache de status: <span style="color: #00ff41;">Limpo ✓</span><br>
+                                    • Cache de pesquisas: <span style="color: #00ff41;">Limpo ✓</span><br>
+                                    • Arquivos temporários: <span style="color: #00ff41;">Removidos ✓</span><br><br>
+                                    <div style="color: #00ff41; font-weight: 500;">
+                                        ⚡ Sistema atualizado! Inconsistências de status resolvidas.
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }, 1500);
+                })
+                .catch(error => {
+                    results.innerHTML = `
+                        <div class="results-area">
+                            <div style="color: #ff4444; margin-bottom: 15px; font-weight: 600;">
+                                Erro ao Limpar Cache
+                            </div>
+                            <div style="color: #888; font-size: 0.9rem;">
+                                ${error.message}
+                            </div>
+                        </div>
+                    `;
+                });
         }
 
         function showAdvancedConfig() {

@@ -26,7 +26,7 @@ class AnalyticsManager {
             $sql = "SELECT 
                 COUNT(CASE WHEN status = 'aberto' THEN 1 END) as abertos,
                 COUNT(CASE WHEN status = 'em_andamento' THEN 1 END) as em_andamento,
-                COUNT(CASE WHEN status = 'fechado' AND DATE(data_fechamento) = CURDATE() THEN 1 END) as fechados_hoje,
+                COUNT(CASE WHEN status = 'fechado' THEN 1 END) as fechados,
                 COUNT(*) as total
             FROM chamados";
             
@@ -37,7 +37,7 @@ class AnalyticsManager {
             return [
                 'abertos' => (int)$result['abertos'],
                 'em_andamento' => (int)$result['em_andamento'], 
-                'fechados_hoje' => (int)$result['fechados_hoje'],
+                'fechados' => (int)$result['fechados'],
                 'total' => (int)$result['total'],
                 'mttr_7dias' => 0,
                 'sla_compliance' => 100,

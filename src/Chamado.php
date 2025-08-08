@@ -85,7 +85,7 @@ class Chamado {
     }
 
     function read(){
-        $cache_key = 'chamados_all_' . date('Y-m-d-H-i'); // Cache por minuto
+        $cache_key = 'chamados_all_' . date('Y-m-d-H-i'); // Cache por minuto para lista geral
         
         return $this->cache->rememberQuery($cache_key, function() {
             $query = "SELECT id, codigo_chamado, nome_colaborador, email, setor, descricao_problema, 
@@ -94,7 +94,7 @@ class Chamado {
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }, 300); // Cache por 5 minutos apenas
+        }, 120); // Cache por 2 minutos apenas (reduzido de 5 min)
     }
 
     function readOne(){
@@ -206,9 +206,43 @@ class Chamado {
         if($stmt->execute()){
             // Limpar cache relacionado após atualização
             $this->invalidateCache();
+            
+            // Invalidação extra para mudanças de status críticas
+            if($status_original != $this->status) {
+                $this->forceInvalidateStatusCache($status_original, $this->status);
+            }
+            
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Invalidação forçada para mudanças de status
+     */
+    private function forceInvalidateStatusCache($old_status, $new_status) {
+        // Limpar cache para ambos os status (antigo e novo)
+        $statuses_to_clear = [$old_status, $new_status, 'all'];
+        
+        foreach ($statuses_to_clear as $status) {
+            // Limpar últimas 24 horas
+            for ($i = 0; $i < 24; $i++) {
+                $timestamp = date('Y-m-d-H', strtotime("-{$i} hours"));
+                if ($status === 'all') {
+                    $this->cache->delete('chamados_all_' . $timestamp);
+                } else {
+                    $this->cache->delete('chamados_status_' . $status . '_' . $timestamp);
+                }
+            }
+            
+            // Limpar cache por minuto da última hora também
+            for ($i = 0; $i < 60; $i++) {
+                $timestamp = date('Y-m-d-H-i', strtotime("-{$i} minutes"));
+                if ($status === 'all') {
+                    $this->cache->delete('chamados_all_' . $timestamp);
+                }
+            }
+        }
     }
 
     function delete(){
@@ -238,10 +272,21 @@ class Chamado {
         ];
         
         foreach ($patterns as $pattern) {
-            // Limpar cache das últimas 24 horas (por minuto agora)
-            for ($i = 0; $i < 1440; $i++) { // 1440 minutos = 24 horas
-                $timestamp = date('Y-m-d-H-i', strtotime("-{$i} minutes"));
+            // Limpar cache das últimas 48 horas (por hora)
+            for ($i = 0; $i < 48; $i++) { // 48 horas
+                $timestamp = date('Y-m-d-H', strtotime("-{$i} hours"));
                 $this->cache->delete($pattern . $timestamp);
+            }
+            
+            // Limpar também cache específico para todos os status
+            if ($pattern === 'chamados_status_') {
+                $statuses = ['aberto', 'em_andamento', 'fechado'];
+                foreach ($statuses as $status) {
+                    for ($i = 0; $i < 48; $i++) {
+                        $timestamp = date('Y-m-d-H', strtotime("-{$i} hours"));
+                        $this->cache->delete($pattern . $status . '_' . $timestamp);
+                    }
+                }
             }
         }
     }
@@ -256,7 +301,7 @@ class Chamado {
             $stmt = $this->conn->prepare($query);
             $stmt->execute([$status]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }, 1800); // Cache por 30 minutos
+        }, 300); // Cache por 5 minutos apenas (reduzido de 30 min)
     }
 
     function generateCodigoChamado($nome_projeto = ""){
