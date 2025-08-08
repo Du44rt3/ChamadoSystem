@@ -1,7 +1,7 @@
 <?php
 /**
  * API Analytics - Endpoint para dados de métricas
- * Sistema ELUS Facilities
+ * Sistema de Chamados e Facilities
  */
 
 header('Content-Type: application/json');

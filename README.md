@@ -1,11 +1,11 @@
-# 🏢 ELUS Facilities - Sistema de Chamados v2.0
+# � Sistema de Chamados e Facilities v2.0
 
 ![Status](https://img.shields.io/badge/Status-Produção-brightgreen)
 ![PHP](https://img.shields.io/badge/PHP-8.0+-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.1.3-purple)
 
-**Sistema completo de gerenciamento de chamados e facilities para a empresa ELUS Instrumentação.**
+**Sistema completo de gerenciamento de chamados e facilities empresariais.**
 
 Sistema profissional desenvolvido para gestão de infraestrutura, tecnologia e facilities, com interface moderna, cache inteligente, analytics avançado e integração completa com Outlook.
 
@@ -167,7 +167,7 @@ define('DB_PASS', '');
 ### 5️⃣ **Acesso ao Sistema**
 ```
 URL: http://localhost/chamados_system/public/
-Login: admin@elusinstrumentacao.com.br
+Login: admin@sistema.com.br
 Senha: admin123
 ```
 
@@ -217,7 +217,7 @@ Senha: admin123
 
 #### **Integração Webmail**
 - **Outlook Web**: Office 365 e Outlook.com
-- **KingHost**: Webmail ELUS personalizado
+- **KingHost**: Webmail empresarial
 - **Gmail**: Fallback universal
 
 ---
@@ -402,7 +402,7 @@ URL: /tests/teste_outlook_*.php
 ## 📞 Suporte e Contato
 
 ### 🆘 **Suporte Técnico**
-- **Email**: suporte@elusinstrumentacao.com.br
+- **Email**: suporte@sistema.com.br
 - **Documentação**: `/docs/` (completa)
 - **FAQ**: Common issues e soluções
 
@@ -421,7 +421,7 @@ URL: /tests/teste_outlook_*.php
 
 <div align="center">
 
-**🏆 ELUS Facilities - Sistema de Chamados v2.0**
+**🏆 Sistema de Chamados e Facilities v2.0**
 
 *Sistema profissional desenvolvido para gestão de infraestrutura e tecnologia*
 
@@ -429,6 +429,6 @@ URL: /tests/teste_outlook_*.php
 [![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4.svg)](https://php.net)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1.svg)](https://mysql.com)
 
-**© 2025 ELUS Instrumentação - Todos os direitos reservados**
+**© 2025 Sistema de Chamados - Código aberto**
 
 </div>

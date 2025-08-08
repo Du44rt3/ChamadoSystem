@@ -1,4 +1,4 @@
-# Pasta de Testes - ELUS Facilities
+# Pasta de Testes - Sistema de Chamados
 
 Esta pasta contém todos os arquivos de teste, debug e diagnóstico do sistema.
 

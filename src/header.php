@@ -1,6 +1,6 @@
 <?php
 /**
- * Header Limpo e Organizado - ELUS Facilities
+ * Header Limpo e Organizado - Sistema de Chamados
  * Sistema de Chamados com Dashboard Analytics
  */
 
