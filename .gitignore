@@ -47,3 +47,12 @@ vendor/
 
 # Scripts de migração sensíveis (após uso)
 migrate_passwords.php
+
+# Testes e arquivos de debug (não versionar)
+tests/
+public/test*.php
+public/debug*.php
+public/*teste*.php
+public/*_backup.php
+*_backup.php
+*.bak

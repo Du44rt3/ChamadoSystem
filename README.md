@@ -1,13 +1,11 @@
-# � Sistema de Chamados e Facilities v2.0
+# Sistema de Chamados v2.0
 
 ![Status](https://img.shields.io/badge/Status-Produção-brightgreen)
 ![PHP](https://img.shields.io/badge/PHP-8.0+-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.1.3-purple)
 
-**Sistema completo de gerenciamento de chamados e facilities empresariais.**
-
-Sistema profissional desenvolvido para gestão de infraestrutura, tecnologia e facilities, com interface moderna, cache inteligente, analytics avançado e integração completa com Outlook.
+Sistema completo de gerenciamento de chamados para equipes de TI, facilities e operações, com interface moderna, cache inteligente, analytics e integração com Outlook.
 
 ---
 
@@ -376,46 +374,21 @@ URL: /tests/teste_outlook_*.php
 
 ---
 
-## 🏆 Valor Comercial
-
-### 💰 **Estimativa de Valor**
-**R$ 22.000 - R$ 28.000** (sistema completo)
-
-### 📊 **Breakdown por Módulo**
-| Módulo | Linhas de Código | Valor Estimado |
-|--------|------------------|----------------|
-| **Core System** | 15.000+ | R$ 12.000 |
-| **Analytics** | 5.000+ | R$ 5.000 |
-| **Security** | 3.000+ | R$ 4.000 |
-| **Email Integration** | 2.000+ | R$ 3.000 |
-| **Cache System** | 1.500+ | R$ 2.000 |
-| **Mobile Interface** | 1.800+ | R$ 2.000 |
-
-### 🎯 **ROI Empresarial**
-- **Redução Tempo**: 60% menos tempo gestão
-- **Eficiência**: 40% mais chamados processados
-- **Qualidade**: 90% SLA compliance
-- **Custo**: 80% redução vs. sistemas externos
+## 📚 Documentação
+- Guias em `docs/` (instalação, deploy, segurança, Outlook Classic)
+- APIs: `public/api/analytics.php` e `public/api/counts.php`
 
 ---
 
-## 📞 Suporte e Contato
-
-### 🆘 **Suporte Técnico**
-- **Email**: suporte@sistema.com.br
-- **Documentação**: `/docs/` (completa)
-- **FAQ**: Common issues e soluções
-
-### 👨‍💻 **Desenvolvimento**
+## 👨‍💻 Desenvolvimento
 - **GitHub**: [Du44rt3/ChamadoSystem](https://github.com/Du44rt3/ChamadoSystem)
 - **Issues**: Reporte bugs e sugestões
 - **Wiki**: Documentação técnica
 
 ### 📚 **Recursos**
-- 📖 **Manual Usuário**: `/docs/MANUAL_USUARIO.md`
-- 🔧 **Manual Admin**: `/docs/MANUAL_ADMIN.md`
-- 🚀 **Deploy Guide**: `/docs/DEPLOY_PRODUCAO_GUIA.md`
-- 🔒 **Security Guide**: `/docs/CHECKLIST_SEGURANCA_PRODUCAO.md`
+- 📖 **Instalação**: `/docs/INSTALACAO_SISTEMA.md`
+- 🚀 **Deploy**: `/docs/DEPLOY_PRODUCAO_GUIA.md`
+- 🔒 **Segurança**: `/docs/CHECKLIST_SEGURANCA_PRODUCAO.md`
 
 ---
 
