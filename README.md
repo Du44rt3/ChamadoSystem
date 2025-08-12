@@ -96,9 +96,6 @@ chamados_system/
 │   ├── 💾 CacheManager.php     # Sistema cache
 │   ├── 🛡️ SecurityHelper.php   # Segurança
 │   └── 📊 analytics/           # Módulos analytics
-├── 📁 tests/                    # Testes e debug
-│   ├── teste_outlook_*.php     # Testes Outlook
-│   └── debug_*.php             # Debug ferramentas
 ├── 📁 tools/                    # Ferramentas
 │   └── clear_cache.php         # Limpeza cache
 └── 📁 uploads/                  # Uploads
@@ -289,14 +286,6 @@ URL: /public/dev_area.php
 - Teste de funcionalidades
 - Monitoramento de performance
 - Debug de SQL queries
-```
-
-### 📋 **Testes Outlook**
-```
-URL: /tests/teste_outlook_*.php
-- Teste completo integração Outlook
-- Diagnóstico de protocolos
-- Validação de templates
 ```
 
 ### 📊 **APIs de Monitoramento**
