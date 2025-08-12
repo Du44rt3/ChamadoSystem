@@ -402,8 +402,8 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="tool-card">
                 <i class="fas fa-tools tool-icon"></i>
                 <div class="tool-title">🔧 Verificar Ferramentas</div>
-                <div class="tool-desc">Verificar se todas as ferramentas estão funcionando corretamente</div>
-                <a href="../tests/verificar_dev_tools.php" class="btn-dev">Verificar Tools</a>
+                <div class="tool-desc">Diagnóstico rápido: PHP, DB, ZIP, permissões, mysqldump</div>
+                <button class="btn-dev" onclick="runToolsCheck()">Rodar Health Check</button>
             </div>
             
             <div class="tool-card">
@@ -459,14 +459,14 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <i class="fas fa-plug tool-icon"></i>
                 <div class="tool-title">Teste de Conexão</div>
                 <div class="tool-desc">Verificar conexão com banco de dados e integridade</div>
-                <a href="../tests/test_connection.php" class="btn-dev">Testar Conexão</a>
+                <button class="btn-dev" onclick="testDbConnection()">Testar Conexão</button>
             </div>
             
             <div class="tool-card">
                 <i class="fas fa-bug tool-icon"></i>
                 <div class="tool-title">Debug de Sessão</div>
-                <div class="tool-desc">Visualizar informações de sessão e debugging</div>
-                <a href="../tests/debug_session.php" class="btn-dev">Debug Session</a>
+                <div class="tool-desc">Visualizar informações de sessão e variáveis</div>
+                <button class="btn-dev" onclick="showSessionDebug()">Mostrar Sessão</button>
             </div>
             
             <div class="tool-card">
@@ -530,6 +530,98 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        async function runToolsCheck() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = `
+                <div class="results-area">
+                    <div style="color: #ffc107; margin-bottom: 15px;">
+                        <i class="fas fa-spinner fa-spin"></i> Executando health check...
+                    </div>
+                </div>
+            `;
+            try {
+                const res = await fetch('../tools/dev_health.php?format=json', { credentials: 'same-origin' });
+                const data = await res.json();
+                const ok = data && data.success;
+                const items = data && data.items ? data.items : {};
+                results.innerHTML = `
+                    <div class="results-area">
+                        <div style="color: ${ok ? '#00ff41' : '#ff6b6b'}; margin-bottom: 10px; font-weight: 600;">
+                            Health Check ${ok ? 'OK' : 'Com alertas'}
+                        </div>
+                        <div style="color: #888; font-size: 0.9rem; line-height: 1.8;">
+                            • PHP: <span style="color:${items.php_ok ? '#00ff41' : '#ff6b6b'}">${items.php_version || 'desconhecido'}</span><br>
+                            • DB: <span style="color:${items.db_connected ? '#00ff41' : '#ff6b6b'}">${items.db_connected ? 'Conectado' : 'Falhou'}</span>${items.db_version ? ' ('+items.db_version+')' : ''}<br>
+                            • ZipArchive: <span style="color:${items.zip_available ? '#00ff41' : '#ff6b6b'}">${items.zip_available ? 'Disponível' : 'Indisponível'}</span><br>
+                            • Temp gravável: <span style="color:${items.temp_writable ? '#00ff41' : '#ff6b6b'}">${items.temp_dir || ''}</span><br>
+                            • Cache gravável: <span style="color:${items.cache_writable ? '#00ff41' : '#ff6b6b'}">cache/</span><br>
+                            • Uploads gravável: <span style="color:${items.uploads_writable ? '#00ff41' : '#ff6b6b'}">uploads/</span><br>
+                            • mysqldump: <span style="color:${items.mysqldump_found ? '#00ff41' : '#ff6b6b'}">${items.mysqldump_path || 'não encontrado'}</span>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `
+                    <div class="results-area" style="color:#ff6b6b;">Falha no health check: ${e.message}</div>
+                `;
+            }
+        }
+
+        async function testDbConnection() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = `
+                <div class="results-area">
+                    <div style="color: #ffc107; margin-bottom: 15px;">
+                        <i class="fas fa-spinner fa-spin"></i> Testando conexão com banco...
+                    </div>
+                </div>
+            `;
+            try {
+                const res = await fetch('../tools/db_check.php?format=json', { credentials: 'same-origin' });
+                const data = await res.json();
+                results.innerHTML = `
+                    <div class="results-area">
+                        <div style="color: ${data.connected ? '#00ff41' : '#ff6b6b'}; margin-bottom: 10px; font-weight: 600;">
+                            Banco ${data.connected ? 'Conectado' : 'Falha na conexão'}
+                        </div>
+                        <div style="color: #888; font-size: 0.9rem; line-height: 1.8;">
+                            • Versão: <span style="color:#00ff41;">${data.server_version || '-'}</span><br>
+                            • Tabelas: <span style="color:#00ff41;">${data.tables_count ?? '-'}</span><br>
+                            • DB: <span style="color:#00ff41;">${data.database || '-'}</span>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `
+                    <div class="results-area" style="color:#ff6b6b;">Erro: ${e.message}</div>
+                `;
+            }
+        }
+
+        async function showSessionDebug() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = `
+                <div class="results-area">
+                    <div style="color: #ffc107; margin-bottom: 15px;">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando sessão...
+                    </div>
+                </div>
+            `;
+            try {
+                const res = await fetch('../tools/session_info.php?format=json', { credentials: 'same-origin' });
+                const data = await res.json();
+                results.innerHTML = `
+                    <div class="results-area">
+                        <div style="color:#00ff41; margin-bottom: 10px; font-weight: 600;">Sessão Atual</div>
+                        <pre style="white-space:pre-wrap;color:#bbb;">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `
+                    <div class="results-area" style="color:#ff6b6b;">Erro ao carregar sessão: ${e.message}</div>
+                `;
+            }
+        }
         function runSecurityCheck() {
             const results = document.getElementById('testResults');
             results.innerHTML = `
@@ -610,57 +702,29 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             `;
         }
         
-        function clearSystemCache() {
+        async function clearSystemCache() {
             const results = document.getElementById('testResults');
             results.innerHTML = `
                 <div class="results-area">
-                    <div style="color: #00ff41; margin-bottom: 20px; font-weight: 600;">
-                        Limpando Cache do Sistema...
-                    </div>
-                    <div style="color: #888; font-size: 0.9rem;">
-                        > Removendo arquivos de cache...<br>
-                        > Limpando cache de queries...<br>
-                        > Invalidando sessões de cache...<br>
-                        > Atualizando índices...
+                    <div style="color: #ffc107; margin-bottom: 15px;">
+                        <i class="fas fa-spinner fa-spin"></i> Limpando cache do sistema...
                     </div>
                 </div>
             `;
-            
-            // Fazer requisição para limpar o cache
-            fetch('../tools/clear_cache.php?admin_clear=true')
-                .then(response => response.text())
-                .then(data => {
-                    setTimeout(() => {
-                        results.innerHTML = `
-                            <div class="results-area">
-                                <div style="color: #00ff41; margin-bottom: 20px; font-weight: 600;">
-                                    Cache Limpo com Sucesso!
-                                </div>
-                                <div style="color: #888; font-size: 0.9rem; line-height: 1.8;">
-                                    • Cache de queries: <span style="color: #00ff41;">Limpo ✓</span><br>
-                                    • Cache de status: <span style="color: #00ff41;">Limpo ✓</span><br>
-                                    • Cache de pesquisas: <span style="color: #00ff41;">Limpo ✓</span><br>
-                                    • Arquivos temporários: <span style="color: #00ff41;">Removidos ✓</span><br><br>
-                                    <div style="color: #00ff41; font-weight: 500;">
-                                        ⚡ Sistema atualizado! Inconsistências de status resolvidas.
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }, 1500);
-                })
-                .catch(error => {
-                    results.innerHTML = `
-                        <div class="results-area">
-                            <div style="color: #ff4444; margin-bottom: 15px; font-weight: 600;">
-                                Erro ao Limpar Cache
-                            </div>
-                            <div style="color: #888; font-size: 0.9rem;">
-                                ${error.message}
-                            </div>
-                        </div>
-                    `;
-                });
+            try {
+                const res = await fetch('../tools/clear_cache.php?admin_clear=true', { credentials: 'same-origin' });
+                const html = await res.text();
+                results.innerHTML = `
+                    <div class="results-area">
+                        <div style="color: #00ff41; margin-bottom: 15px; font-weight: 600;">Cache limpo com sucesso</div>
+                        <div style="color:#bbb; font-family: 'Courier New', monospace;">${html}</div>
+                    </div>
+                `;
+            } catch (e) {
+                results.innerHTML = `
+                    <div class="results-area" style="color:#ff6b6b;">Erro ao limpar cache: ${e.message}</div>
+                `;
+            }
         }
 
         function showAdvancedConfig() {
@@ -704,31 +768,7 @@ $users_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             alert('Funcionalidade em desenvolvimento. Use o arquivo .env para alterar APP_DEBUG.');
         }
 
-        function clearSystemCache() {
-            const results = document.getElementById('testResults');
-            results.innerHTML = `
-                <div class="results-area">
-                    <div style="color: #ffc107; margin-bottom: 15px;">
-                        <i class="fas fa-spinner fa-spin"></i> Limpando cache do sistema...
-                    </div>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                results.innerHTML = `
-                    <div class="results-area">
-                        <div style="color: #00ff41; margin-bottom: 15px; font-weight: 600;">
-                            Cache do sistema limpo com sucesso!
-                        </div>
-                        <div style="color: #888; font-size: 0.9rem;">
-                            • Cache de sessões: Limpo<br>
-                            • Cache de configurações: Limpo<br>
-                            • Arquivos temporários: Removidos
-                        </div>
-                    </div>
-                `;
-            }, 1500);
-        }
+    // (remoção da duplicata de clearSystemCache)
 
         function restartSessions() {
             if (confirm('Isso irá desconectar todos os usuários. Continuar?')) {

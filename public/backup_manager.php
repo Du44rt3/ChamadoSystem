@@ -26,7 +26,13 @@ if (isset($_GET['download'])) {
             require_once '../config/config.php';
             
             // Comando mysqldump
-            $command = "\"C:\\xampp\\mysql\\bin\\mysqldump.exe\" --user=" . DB_USER . " --password=" . DB_PASS . " --host=" . DB_HOST . " --single-transaction --routines --triggers " . DB_NAME;
+            // Permitir override via ENV (se houver) ou usar padrão do XAMPP
+            $mysqldump = getenv('MYSQLDUMP_PATH') ?: "C:\\xampp\\mysql\\bin\\mysqldump.exe";
+            $mysqldumpEsc = '"' . $mysqldump . '"';
+            if (!file_exists($mysqldump)) {
+                throw new Exception("mysqldump não encontrado em: $mysqldump. Defina MYSQLDUMP_PATH no ambiente, se necessário.");
+            }
+            $command = $mysqldumpEsc . " --user=" . DB_USER . " --password=" . DB_PASS . " --host=" . DB_HOST . " --single-transaction --routines --triggers " . DB_NAME;
             
             // Executar comando
             $output = shell_exec($command);
@@ -69,7 +75,7 @@ if (isset($_GET['download'])) {
             
             // Adicionar arquivos do sistema
             $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator('../'),
+                new RecursiveDirectoryIterator('../', FilesystemIterator::SKIP_DOTS),
                 RecursiveIteratorIterator::LEAVES_ONLY
             );
             
@@ -86,10 +92,17 @@ if (isset($_GET['download'])) {
                     $relativePath = substr($filePath, strlen(realpath('../')) + 1);
                     
                     // Pular alguns arquivos desnecessários
-                    if (!preg_match('/\.(log|tmp|cache)$/i', $relativePath) && 
-                        !strpos($relativePath, '.git') &&
-                        !strpos($relativePath, 'node_modules') &&
-                        !strpos($relativePath, '.env')) {
+                    // Excluir itens desnecessários do backup de arquivos
+                    $exclude = (
+                        preg_match('/\.(log|tmp|cache)$/i', $relativePath) ||
+                        strpos($relativePath, '.git') !== false ||
+                        strpos($relativePath, 'node_modules') !== false ||
+                        strpos($relativePath, 'cache' . DIRECTORY_SEPARATOR) === 0 ||
+                        strpos($relativePath, 'uploads' . DIRECTORY_SEPARATOR) === 0 ||
+                        strpos($relativePath, 'logs' . DIRECTORY_SEPARATOR) === 0 ||
+                        basename($relativePath) === '.env'
+                    );
+                    if (!$exclude) {
                         
                         // Tentar adicionar o arquivo ao ZIP
                         if ($zip->addFile($filePath, $relativePath)) {
@@ -167,7 +180,7 @@ if (isset($_GET['download'])) {
             
             // 2. Adicionar arquivos do sistema
             $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator('../'),
+                new RecursiveDirectoryIterator('../', FilesystemIterator::SKIP_DOTS),
                 RecursiveIteratorIterator::LEAVES_ONLY
             );
             
@@ -183,9 +196,16 @@ if (isset($_GET['download'])) {
                     $relativePath = substr($filePath, strlen(realpath('../')) + 1);
                     
                     // Pular alguns arquivos desnecessários
-                    if (!preg_match('/\.(log|tmp|cache)$/i', $relativePath) && 
-                        !strpos($relativePath, '.git') &&
-                        !strpos($relativePath, 'node_modules')) {
+                    $exclude = (
+                        preg_match('/\.(log|tmp|cache)$/i', $relativePath) ||
+                        strpos($relativePath, '.git') !== false ||
+                        strpos($relativePath, 'node_modules') !== false ||
+                        strpos($relativePath, 'cache' . DIRECTORY_SEPARATOR) === 0 ||
+                        strpos($relativePath, 'uploads' . DIRECTORY_SEPARATOR) === 0 ||
+                        strpos($relativePath, 'logs' . DIRECTORY_SEPARATOR) === 0 ||
+                        basename($relativePath) === '.env'
+                    );
+                    if (!$exclude) {
                         
                         // Tentar adicionar o arquivo ao ZIP
                         $zip->addFile($filePath, 'files/' . $relativePath);
