@@ -1,396 +1,464 @@
-# Sistema de Chamados v2.0
+# ELUS Facilities - Sistema de Chamados Corporativo
+
+```
+████████╗██╗ ██████╗██╗  ██╗███████╗████████╗    ███████╗██╗   ██╗███████╗████████╗███████╗███╗   ███╗
+╚══██╔══╝██║██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝    ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝████╗ ████║
+   ██║   ██║██║     █████╔╝ █████╗     ██║       ███████╗ ╚████╔╝ ███████╗   ██║   █████╗  ██╔████╔██║
+   ██║   ██║██║     ██╔═██╗ ██╔══╝     ██║       ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝  ██║╚██╔╝██║
+   ██║   ██║╚██████╗██║  ██╗███████╗   ██║       ███████║   ██║   ███████║   ██║   ███████╗██║ ╚═╝ ██║
+   ╚═╝   ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝   ╚═╝       ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝╚═╝     ╚═╝
+```
 
 ![Status](https://img.shields.io/badge/Status-Produção-brightgreen)
-![PHP](https://img.shields.io/badge/PHP-8.0+-blue)
-![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.1.3-purple)
+![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-Sistema completo de gerenciamento de chamados para equipes de TI, facilities e operações, com interface moderna, cache inteligente, analytics e integração com Outlook.
-
----
-
-## 🚀 Características Principais
-
-### ✨ **Interface Moderna**
-- Design responsivo com Bootstrap 5.1.3
-- Interface intuitiva com abas de navegação
-- Cards e listagens dinâmicas
-- Tema profissional com gradientes e animações
-
-### 🔧 **Funcionalidades Core**
-- **Gestão Completa de Chamados**: Abertura, andamento, fechamento com SLA automático
-- **Sistema de Usuários**: 4 níveis de acesso (user, tecnico, admin, desenvolvedor)
-- **Histórico de Atividades**: Tracking completo de cada chamado
-- **Sistema de Anexos**: Upload de imagens e documentos
-- **Busca Avançada**: Filtros por status, período, gravidade
-
-### 📊 **Analytics e Relatórios**
-- Dashboard com métricas em tempo real
-- MTTR (Mean Time To Resolution)
-- SLA Compliance
-- Gráficos por setor, gravidade e período
-- Contadores automáticos nas abas
-
-### 📧 **Integração de Email**
-- **Templates Automáticos**: Para abertura, andamento e fechamento
-- **Outlook Classic**: Integração com arquivo .eml e cópia inteligente
-- **Outlook Moderno**: Protocolo ms-outlook://
-- **Webmail**: Integração com KingHost
-- **Cliente Padrão**: Fallback mailto universal
-
-### ⚡ **Performance e Cache**
-- **Sistema de Cache Inteligente**: Reduz consultas ao banco em 80%
-- **Cache Manager**: Invalidação automática e manual
-- **Refresh Automático**: Atualização periódica de dados
-- **Progressive Disclosure**: Carregamento sob demanda
-
-### 🔒 **Segurança Avançada**
-- **Autenticação**: Hash ARGON2ID + salt
-- **Proteção CSRF**: Tokens dinâmicos
-- **Sanitização XSS**: Filtros em todas as entradas
-- **Middleware de Autenticação**: Proteção de rotas
-- **Logs de Segurança**: Monitoramento de ações
+Sistema empresarial de gestão de chamados, facilities e infraestrutura corporativa. Arquitetura robusta com cache inteligente, analytics avançado, segurança enterprise e integração completa com sistemas de email.
 
 ---
 
-## 📁 Arquitetura do Sistema
+## Características Técnicas
+
+**Core System**
+- Gestão completa de chamados com workflow automatizado
+- Sistema de usuários hierárquico (4 níveis de acesso)
+- Analytics dashboard com métricas em tempo real
+- Sistema de cache inteligente com invalidação automática
+- Integração nativa com Outlook Classic e webmail
+
+**Security & Performance**
+- Autenticação ARGON2ID com proteção CSRF
+- Sanitização XSS completa em todas as entradas
+- Cache Manager reduzindo 80% das consultas ao banco
+- Progressive Disclosure UI para otimização de interface
+- Rate limiting e logs de segurança
+
+**Integration & Scalability**
+- API REST para integrações externas
+- Sistema de templates de email personalizáveis
+- Upload de anexos com validação de segurança
+- Backup automático e scripts de deploy
+- Monitoramento de performance e debug tools
+
+---
+
+## Arquitetura Completa do Sistema
 
 ```
 chamados_system/
-├── 📁 cache/                    # Cache do sistema (auto-gerado)
-├── 📁 config/                   # Configurações
-│   └── config.php              # Config principal do sistema
-├── 📁 css/                      # Estilos customizados
-│   └── style.css               # CSS principal
-├── 📁 database/                 # Scripts de banco
-│   ├── chamados_db.sql         # Schema principal
-│   ├── install_sistema_completo.sql  # Instalação completa
-│   └── *.php                   # Scripts de migração
-├── 📁 docs/                     # Documentação completa
-│   ├── 📄 INSTALACAO_SISTEMA.md
-│   ├── 📄 DEPLOY_PRODUCAO_GUIA.md
-│   ├── 📄 SECURITY_IMPROVEMENTS.md
-│   └── 📄 OUTLOOK_CLASSIC_SOLUCAO.md
-├── 📁 public/                   # Aplicação web
-│   ├── 🏠 index.php            # Dashboard principal
-│   ├── 🔐 login.php            # Sistema de login
-│   ├── ➕ add.php              # Criar chamados
-│   ├── ✏️ edit.php             # Editar chamados
-│   ├── 👁️ view.php             # Visualizar chamados
-│   ├── 📊 dashboard.php        # Analytics dashboard
-│   ├── 📧 email_template.php   # Templates de email
-│   ├── 🛠️ dev_area.php         # Área de desenvolvimento
-│   └── 📁 api/                 # APIs REST
-│       ├── analytics.php       # API de métricas
-│       └── counts.php          # API de contadores
-├── 📁 scripts/                  # Automação
-│   ├── deploy_automatico.ps1   # Deploy automático
-│   ├── configurar_https_xampp.bat  # HTTPS XAMPP
-│   └── criar_pacote_producao.bat   # Build produção
-├── 📁 src/                      # Classes PHP
-│   ├── 🔧 DB.php               # Conexão banco
-│   ├── 🔐 Auth.php             # Autenticação
-│   ├── 📋 Chamado.php          # CRUD chamados
-│   ├── 📊 AnalyticsManager.php # Analytics
-│   ├── 📧 EmailTemplate.php    # Templates email
-│   ├── 💾 CacheManager.php     # Sistema cache
-│   ├── 🛡️ SecurityHelper.php   # Segurança
-│   └── 📊 analytics/           # Módulos analytics
-├── 📁 tools/                    # Ferramentas
-│   └── clear_cache.php         # Limpeza cache
-└── 📁 uploads/                  # Uploads
-    └── anexos/                 # Anexos dos chamados
+├── .env                                # Configurações ambiente
+├── .env.example                        # Template configurações
+├── .gitignore                          # Controle versão
+├── iniciar_xampp.bat                   # Inicialização XAMPP
+├── README.md                           # Documentação principal
+├── PONTOS_FRACOS_CODIGO.txt           # Análise técnica
+├── ROADMAP_MELHORIAS.txt              # Planejamento evolução
+│
+├── assets/                             # Recursos frontend
+│   ├── css/
+│   │   ├── chamados-list.css          # Estilos listagem
+│   │   └── progressive-disclosure.css  # UI otimizada
+│   └── js/
+│       └── chamados-list.js           # JavaScript principal
+│
+├── cache/                              # Sistema cache
+│   ├── .htaccess                      # Proteção Apache
+│   └── *.cache                        # Arquivos cache
+│
+├── config/                             # Configurações sistema
+│   └── config.php                     # Configuração principal
+│
+├── css/                                # Estilos customizados
+│   └── style.css                      # CSS global
+│
+├── database/                           # Scripts banco dados
+│   ├── anexos_images.sql              # Estrutura anexos
+│   ├── atualizar_senhas_usuarios.php  # Migração senhas
+│   ├── chamados_db.sql                # Schema principal
+│   ├── dashboard_analytics_structure.sql # Analytics DB
+│   ├── fix_trigger_conflict.sql       # Correção triggers
+│   ├── fix_triggers.sql               # Triggers sistema
+│   ├── gerar_hashes_senhas.php        # Geração hashes
+│   ├── install_sistema_completo.sql   # Instalação completa
+│   ├── migrate_passwords.php          # Migração passwords
+│   └── update_db.php                  # Atualizações DB
+│
+├── docs/                               # Documentação técnica
+│   ├── analytics_example.php          # Exemplo analytics
+│   ├── ATUALIZACAO_INCREMENTAL.md     # Guia atualização
+│   ├── ATUALIZACAO_RAPIDA.md          # Atualização rápida
+│   ├── CHECKLIST_SEGURANCA_PRODUCAO.md # Checklist segurança
+│   ├── CORRECAO_DUPLICACAO_CHAMADOS.md # Correção duplicação
+│   ├── DASHBOARD_ANALYTICS_PLANO.md   # Planejamento analytics
+│   ├── DASHBOARD_ANALYTICS_README.md  # Documentação analytics
+│   ├── DEPLOY_PRODUCAO_GUIA.md        # Guia deploy
+│   ├── GUIA_HTTPS.md                  # Configuração HTTPS
+│   ├── INSTALACAO_SISTEMA.md          # Guia instalação
+│   ├── LIMPEZA_SISTEMA_COMPLETA.md    # Limpeza sistema
+│   ├── OUTLOOK_CLASSIC_SOLUCAO.md     # Integração Outlook
+│   ├── REFATORACAO_ELIMINACAO_DUPLICACAO.md # Refatoração
+│   ├── RELATORIO_SEGURANCA_FINAL.md   # Relatório segurança
+│   ├── SECURITY_IMPROVEMENTS.md       # Melhorias segurança
+│   ├── SEGURANCA_CORRECOES_IMPLEMENTADAS.md # Correções
+│   └── SISTEMA_ANEXOS_IMAGENS.md      # Sistema anexos
+│
+├── logs/                               # Logs sistema
+│   └── debug_export_*.json            # Debug exports
+│
+├── public/                             # Aplicação web
+│   ├── abertos.php                    # Chamados abertos
+│   ├── add.php                        # Criar chamado
+│   ├── add_atividade.php              # Adicionar atividade
+│   ├── adicionar_anexos.php           # Upload anexos
+│   ├── backup_manager.php             # Gerenciador backup
+│   ├── dashboard.php                  # Dashboard analytics
+│   ├── delete.php                     # Excluir chamado
+│   ├── delete_atividade.php           # Excluir atividade
+│   ├── dev_area.php                   # Área desenvolvimento
+│   ├── download_anexo.php             # Download anexos
+│   ├── edit.php                       # Editar chamado
+│   ├── edit_atividade.php             # Editar atividade
+│   ├── em_andamento.php               # Chamados andamento
+│   ├── email_template.php             # Templates email
+│   ├── email_template_simples.php     # Template simples
+│   ├── excluir_anexo.php              # Excluir anexo
+│   ├── fechados.php                   # Chamados fechados
+│   ├── index.php                      # Dashboard principal
+│   ├── login.php                      # Sistema login
+│   ├── logout.php                     # Logout
+│   ├── manage_levels.php              # Gestão níveis
+│   ├── register_user.php              # Registro usuários
+│   ├── user_manager.php               # Gestão usuários
+│   ├── view.php                       # Visualizar chamado
+│   │
+│   ├── api/                           # APIs REST
+│   │   ├── analytics.php              # API analytics
+│   │   └── counts.php                 # API contadores
+│   │
+│   └── images/                        # Recursos visuais
+│       ├── favicon.png                # Ícone site
+│       ├── logo-eluss.jpg             # Logo JPEG
+│       ├── logo-eluss.png             # Logo PNG
+│       └── wpp.jpg                    # WhatsApp icon
+│
+├── scripts/                            # Scripts automação
+│   ├── atualizacao_incremental.ps1    # Atualização incremental
+│   ├── atualizar_sistema_seguro.bat   # Atualização segura
+│   ├── configurar_https_xampp.bat     # HTTPS XAMPP batch
+│   ├── configurar_https_xampp.ps1     # HTTPS XAMPP PowerShell
+│   ├── criar_pacote_producao.bat      # Build produção
+│   ├── deploy_automatico.ps1          # Deploy automático
+│   ├── deploy_ftp.ps1                 # Deploy FTP
+│   ├── instalar_sistema_anexos.bat    # Instalação anexos
+│   │
+│   └── deploy_package/                # Pacote deploy
+│       ├── .htaccess                  # Configuração Apache
+│       └── README_INSTALACAO.txt      # Instruções instalação
+│
+├── src/                                # Classes PHP core
+│   ├── AssetManager.php               # Gerenciamento assets
+│   ├── Auth.php                       # Autenticação
+│   ├── AuthMiddleware.php             # Middleware auth
+│   ├── CacheManager.php               # Sistema cache
+│   ├── Chamado.php                    # CRUD chamados
+│   ├── ChamadoAnexo.php               # Gestão anexos
+│   ├── ChamadoHistorico.php           # Histórico chamados
+│   ├── DB.php                         # Conexão banco
+│   ├── EmailTemplate.php              # Templates email
+│   ├── EnvLoader.php                  # Carregamento env
+│   ├── header.php                     # Header comum
+│   ├── LevelManager.php               # Gestão níveis
+│   ├── ProgressiveDisclosureUI.php    # UI otimizada
+│   ├── SecurityHelper.php             # Helpers segurança
+│   ├── SecurityValidator.php          # Validação segurança
+│   ├── TemplatePersonalizado.php      # Templates custom
+│   │
+│   ├── analytics/                     # Módulo analytics
+│   │   └── AnalyticsManager.php       # Gerenciador analytics
+│   │
+│   ├── components/                    # Componentes UI
+│   │   ├── AnalyticsWidget.php        # Widget analytics
+│   │   ├── ChamadoAnexosView.php      # Visualização anexos
+│   │   ├── ChamadoDetailView.php      # Detalhes chamado
+│   │   ├── ChamadoHistoricoView.php   # Histórico view
+│   │   ├── ChamadosListView.php       # Lista chamados
+│   │   ├── ChamadoViewController.php  # Controller view
+│   │   └── HomePageView.php           # View homepage
+│   │
+│   └── templates/                     # Templates sistema
+│       ├── ChamadosPageTemplate.php   # Template página
+│       ├── ChamadoViewTemplate.php    # Template view
+│       └── HomePageTemplate.php      # Template home
+│
+├── tools/                              # Ferramentas sistema
+│   ├── check_levels_table.php         # Verificação níveis
+│   ├── clear_cache.php                # Limpeza cache
+│   ├── db_check.php                   # Verificação DB
+│   ├── dev_actions.php                # Ações desenvolvimento
+│   ├── dev_health.php                 # Health check
+│   ├── security_check.php             # Verificação segurança
+│   └── session_info.php               # Informações sessão
+│
+└── uploads/                            # Uploads sistema
+    ├── .htaccess                      # Proteção Apache
+    └── anexos/                        # Anexos chamados
+        └── anexo_*.jpg|png|pdf        # Arquivos anexos
 ```
 
 ---
 
-## ⚙️ Requisitos do Sistema
+## Requisitos Técnicos
 
-### 📋 **Requisitos Mínimos**
-- **PHP**: 8.0 ou superior
-- **MySQL**: 8.0 ou superior (MariaDB 10.4+)
-- **Apache**: 2.4+ com mod_rewrite
-- **Extensões PHP**: PDO, mysqli, mbstring, json, session
-- **Memória**: 128MB RAM disponível
-- **Espaço**: 500MB disco
+**Servidor**
+- PHP 8.1+ com extensões: PDO, mysqli, mbstring, json, session, fileinfo
+- MySQL 8.0+ ou MariaDB 10.4+
+- Apache 2.4+ com mod_rewrite, mod_expires, mod_deflate
+- 512MB RAM mínimo, 2GB recomendado
+- 2GB espaço disco (logs + uploads)
 
-### 🔧 **Requisitos Recomendados**
-- **PHP**: 8.1+ com OPcache habilitado
-- **MySQL**: 8.0.27+ com query cache
-- **Apache**: 2.4.54+ com mod_expires, mod_deflate
-- **Memória**: 512MB+ RAM
-- **Espaço**: 2GB+ disco (logs + uploads)
+**Cliente**
+- Navegadores modernos: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
+- JavaScript habilitado
+- Resolução mínima: 1024x768
+- Conexão internet estável
 
-### 🌐 **Compatibilidade**
-- **Navegadores**: Chrome 90+, Firefox 88+, Edge 90+, Safari 14+
-- **Outlook**: Classic 2016+, Office 365, Outlook Web
-- **Mobile**: Android 8+, iOS 12+ (interface responsiva)
+**Integração Email**
+- SMTP configurado ou cliente email padrão
+- Outlook 2016+ para integração .eml
+- Suporte webmail para fallback
 
 ---
 
-## 🚀 Instalação Rápida
+## Instalação e Configuração
 
-### 1️⃣ **Download e Extração**
+**Configuração Rápida**
 ```bash
-# Clone ou baixe o repositório
+# 1. Clone repositório
 git clone https://github.com/Du44rt3/ChamadoSystem.git
 cd ChamadoSystem
+
+# 2. Configure banco de dados
+mysql -u root -p < database/install_sistema_completo.sql
+
+# 3. Configure ambiente
+cp .env.example .env
+# Edite .env com suas configurações
+
+# 4. Configure Apache virtual host ou inicie XAMPP
+./iniciar_xampp.bat
+
+# 5. Acesse sistema
+# URL: http://localhost/chamados_system/public/
+# Login: admin@sistema.com.br | Senha: admin123
 ```
 
-### 2️⃣ **Configuração XAMPP (Windows)**
-```bash
-# Execute o script automático
-iniciar_xampp.bat
-```
-
-### 3️⃣ **Configuração do Banco**
-```sql
--- Execute no MySQL/phpMyAdmin
--- Use o arquivo: database/install_sistema_completo.sql
-source database/install_sistema_completo.sql;
-```
-
-### 4️⃣ **Configuração PHP**
+**Configuração Avançada**
 ```php
-// Edite: config/config.php
+// config/config.php - Configurações principais
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'chamados_db');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-```
 
-### 5️⃣ **Acesso ao Sistema**
-```
-URL: http://localhost/chamados_system/public/
-Login: admin@sistema.com.br
-Senha: admin123
-```
+// Cache settings
+define('CACHE_TTL', 300);        // 5 minutos
+define('CACHE_ENABLED', true);
 
----
-
-## 📊 Funcionalidades Detalhadas
-
-### 🎯 **Dashboard Principal**
-- **Visão Geral**: Cards com contadores de status
-- **Filtros Dinâmicos**: Por status, gravidade, período
-- **Busca Avançada**: Texto completo com highlighting
-- **Auto-refresh**: Atualização automática a cada 2 minutos
-- **Navegação por Abas**: Interface intuitiva com contadores
-
-### 📋 **Gestão de Chamados**
-- **Códigos Únicos**: Auto-geração baseada em projeto
-- **SLA Automático**: Cálculo baseado na gravidade
-- **Status Tracking**: Workflow completo (Aberto → Andamento → Fechado)
-- **Anexos**: Upload múltiplo de imagens/documentos
-- **Histórico**: Timeline completa de atividades
-
-### 👥 **Sistema de Usuários**
-| Nível | Permissões |
-|-------|-----------|
-| **User** | Visualizar chamados próprios |
-| **Técnico** | Gerenciar chamados, adicionar atividades |
-| **Admin** | Gestão completa, analytics, usuários |
-| **Desenvolvedor** | Acesso total + área de desenvolvimento |
-
-### 📊 **Analytics Avançado**
-- **Métricas em Tempo Real**: Contadores automáticos
-- **MTTR**: Tempo médio de resolução
-- **SLA Compliance**: % de chamados dentro do prazo
-- **Gráficos**: Evolução temporal, distribuição por setor
-- **Exportação**: PDF, Excel, CSV
-
-### 📧 **Sistema de Email**
-#### **Templates Inteligentes**
-- **Abertura**: Notificação inicial com dados do chamado
-- **Andamento**: Atualizações com última atividade
-- **Fechamento**: Resumo final com solução
-
-#### **Integração Outlook Classic** ⭐
-- **Método 1**: Arquivo .eml para download (recomendado)
-- **Método 2**: Cópia inteligente com instruções visuais
-- **100% Compatível**: Todas as versões do Outlook
-
-#### **Integração Webmail**
-- **Outlook Web**: Office 365 e Outlook.com
-- **KingHost**: Webmail empresarial
-- **Gmail**: Fallback universal
-
----
-
-## 🔧 Configuração Avançada
-
-### ⚡ **Cache System**
-```php
-// Configure em: src/CacheManager.php
-define('CACHE_TTL', 300);        // 5 minutos padrão
-define('CACHE_ENABLED', true);   // Habilitar cache
-define('CACHE_DEBUG', false);    // Debug modo
-```
-
-### 📊 **Analytics**
-```php
-// Configure em: src/analytics/AnalyticsManager.php
-$analytics_config = [
-    'realtime' => true,          // Métricas tempo real
-    'cache_ttl' => 120,         // Cache 2 minutos
-    'auto_refresh' => true      // Auto-refresh frontend
-];
-```
-
-### 🔒 **Segurança**
-```php
-// Configure em: src/SecurityHelper.php
+// Security settings
 define('CSRF_TOKEN_TTL', 3600);  // 1 hora
-define('MAX_LOGIN_ATTEMPTS', 5); // Tentativas login
-define('LOCKOUT_TIME', 900);     // 15 min lockout
+define('MAX_LOGIN_ATTEMPTS', 5);
+define('LOCKOUT_TIME', 900);     // 15 minutos
 ```
 
 ---
 
-## 🛠️ Scripts de Automação
+## Funcionalidades do Sistema
 
-### 📦 **Deploy Produção**
+**Gestão de Chamados**
+- Workflow completo: Aberto → Em Andamento → Fechado
+- Códigos únicos auto-gerados por projeto
+- SLA automático baseado na gravidade
+- Sistema de anexos com validação de segurança
+- Histórico completo de atividades
+
+**Sistema de Usuários**
+```
+┌─────────────────┬──────────────────────────────────────┐
+│ Nível           │ Permissões                           │
+├─────────────────┼──────────────────────────────────────┤
+│ Usuario         │ Visualizar chamados próprios        │
+│ Tecnico         │ Gerenciar chamados, atividades      │
+│ Admin           │ Gestão completa, analytics, users   │
+│ Desenvolvedor   │ Acesso total + área desenvolvimento │
+└─────────────────┴──────────────────────────────────────┘
+```
+
+**Analytics Dashboard**
+- Contadores em tempo real por status
+- MTTR (Mean Time To Resolution)
+- SLA Compliance percentual
+- Gráficos de evolução temporal
+- Distribuição por setor e gravidade
+- Exportação para PDF/Excel/CSV
+
+**Sistema de Cache**
+- Cache inteligente com TTL configurável
+- Invalidação automática em mudanças
+- Redução de 80% nas consultas ao banco
+- Interface de gestão manual
+- Debug mode para desenvolvimento
+
+**Segurança Corporativa**
+- Autenticação ARGON2ID com salt
+- Proteção CSRF em todos os formulários
+- Sanitização XSS completa
+- Rate limiting contra brute force
+- Logs de segurança detalhados
+- Middleware de autenticação
+
+---
+
+## APIs e Integrações
+
+**APIs REST**
+```
+GET  /public/api/analytics.php?type=header    # Métricas dashboard
+GET  /public/api/counts.php                   # Contadores simples
+POST /tools/dev_actions.php                   # Ações desenvolvimento
+```
+
+**Integração Email**
+- Templates automáticos para abertura/andamento/fechamento
+- Integração Outlook Classic via arquivos .eml
+- Fallback para webmail e clientes padrão
+- Personalização completa de templates
+- Cópia inteligente com instruções visuais
+
+**Backup e Deploy**
 ```powershell
-# PowerShell (Windows)
+# Deploy automático produção
 scripts/deploy_automatico.ps1 -Environment Production
 
-# Cria backup, otimiza código, configura HTTPS
+# Backup completo sistema
+public/backup_manager.php
+
+# Configuração HTTPS XAMPP
+scripts/configurar_https_xampp.ps1
 ```
 
-### 🔧 **Ferramentas XAMPP**
-```batch
-# Configurar HTTPS
-scripts/configurar_https_xampp.bat
+---
 
-# Iniciar serviços
-iniciar_xampp.bat
-```
+## Desenvolvimento e Debug
 
-### 🧹 **Limpeza Cache**
+**Área de Desenvolvimento**
+- URL: `/public/dev_area.php`
+- Health check sistema
+- Verificação banco de dados
+- Informações de sessão
+- Logs em tempo real
+- Ferramentas de debug
+
+**Ferramentas Disponíveis**
+- `tools/clear_cache.php` - Limpeza cache
+- `tools/security_check.php` - Verificação segurança
+- `tools/db_check.php` - Status banco dados
+- `tools/check_levels_table.php` - Diagnóstico níveis
+
+**Debug Mode**
 ```php
-# Via web (admin)
-tools/clear_cache.php?admin_clear=true
-
-# Via CLI
-php tools/clear_cache.php
+// Habilitar debug em config/config.php
+define('APP_DEBUG', true);
+define('CACHE_DEBUG', true);
 ```
 
 ---
 
-## 🔍 Debug e Monitoramento
+## Performance e Otimização
 
-### 🐛 **Área de Desenvolvimento**
+**Métricas de Performance**
+- Page load time: < 2 segundos
+- Time to interactive: < 3 segundos
+- Cache hit rate: > 85%
+- Database queries: < 10 por página
+
+**Otimizações Implementadas**
+- Sistema de cache com invalidação inteligente
+- Progressive Disclosure UI
+- Lazy loading de componentes
+- CSS/JS minificado
+- GZIP compression
+- Browser cache otimizado
+
+**Monitoramento**
+- Logs de performance automáticos
+- Métricas de cache em tempo real
+- Monitoramento de queries SQL
+- Alertas de performance degradada
+
+---
+
+## Segurança e Compliance
+
+**Proteções Implementadas**
+- SQL Injection: Prepared statements obrigatórios
+- XSS: Sanitização em todas as entradas/saídas
+- CSRF: Tokens únicos por sessão
+- Session Hijacking: Regeneração automática de ID
+- File Upload: Validação MIME type e extensão
+- Brute Force: Rate limiting com lockout
+
+**Compliance Standards**
+- LGPD: Tratamento adequado de dados pessoais
+- ISO 27001: Controles de segurança implementados
+- OWASP Top 10: Mitigação completa de vulnerabilidades
+
+**Auditoria e Logs**
+- Log completo de todas as ações
+- Tracking de tentativas de login
+- Auditoria de mudanças em chamados
+- Monitoramento de atividades suspeitas
+
+---
+
+## Documentação Técnica
+
+**Guias Disponíveis**
+- `docs/INSTALACAO_SISTEMA.md` - Instalação completa
+- `docs/DEPLOY_PRODUCAO_GUIA.md` - Deploy produção
+- `docs/SECURITY_IMPROVEMENTS.md` - Melhorias segurança
+- `docs/OUTLOOK_CLASSIC_SOLUCAO.md` - Integração Outlook
+- `docs/DASHBOARD_ANALYTICS_README.md` - Analytics avançado
+
+**Recursos Técnicos**
+- Documentação API completa
+- Exemplos de integração
+- Scripts de automação
+- Troubleshooting guides
+- Best practices corporativas
+
+---
+
+## Suporte e Desenvolvimento
+
+**Repositório**: [Du44rt3/ChamadoSystem](https://github.com/Du44rt3/ChamadoSystem)
+**Licença**: MIT License
+**Versão**: 2.0 Enterprise
+
+**Para Suporte Técnico**
+- Issues: Reporte bugs e solicitações
+- Wiki: Documentação técnica detalhada
+- Releases: Atualizações e changelog
+
+---
+
 ```
-URL: /public/dev_area.php
-- Logs do sistema em tempo real
-- Teste de funcionalidades
-- Monitoramento de performance
-- Debug de SQL queries
+  ╔══════════════════════════════════════════════════════════════╗
+  ║                   ELUS FACILITIES                            ║
+  ║               Sistema Corporativo v2.0                      ║
+  ║                                                              ║
+  ║  Desenvolvido para gestão empresarial de infraestrutura     ║
+  ║  e facilities com padrões corporativos de segurança,        ║
+  ║  performance e escalabilidade.                              ║
+  ╚══════════════════════════════════════════════════════════════╝
 ```
-
-### 📊 **APIs de Monitoramento**
-```
-/public/api/analytics.php?type=header  # Métricas header
-/public/api/counts.php                 # Contadores simples
-```
-
----
-
-## 📈 Performance e Otimização
-
-### ⚡ **Cache Inteligente**
-- **Query Cache**: Reduz 80% das consultas ao banco
-- **Invalidação Automática**: Detecta mudanças de status
-- **TTL Inteligente**: Timeouts baseados na criticidade
-- **Progressive Loading**: Carregamento sob demanda
-
-### 🚀 **Otimizações Frontend**
-- **CSS/JS Minificado**: Reduz tamanho em 40%
-- **Lazy Loading**: Imagens carregadas sob demanda
-- **GZIP Compression**: Habilitado no Apache
-- **Browser Cache**: Headers otimizados
-
-### 📊 **Métricas de Performance**
-- **Page Load**: < 2 segundos
-- **Time to Interactive**: < 3 segundos
-- **Cache Hit Rate**: > 85%
-- **Database Queries**: < 10 por página
-
----
-
-## 🔒 Segurança e Compliance
-
-### 🛡️ **Proteções Implementadas**
-- ✅ **SQL Injection**: Prepared statements
-- ✅ **XSS**: Sanitização completa
-- ✅ **CSRF**: Tokens únicos por sessão
-- ✅ **Session Hijacking**: Regeneração de ID
-- ✅ **Brute Force**: Rate limiting
-- ✅ **File Upload**: Validação de tipo e tamanho
-
-### 📋 **Compliance**
-- ✅ **LGPD**: Tratamento dados pessoais
-- ✅ **ISO 27001**: Controles de segurança
-- ✅ **OWASP Top 10**: Mitigação completa
-
-### 🔍 **Monitoramento**
-- **Logs de Acesso**: Todas as ações registradas
-- **Alertas**: Tentativas de invasão
-- **Auditoria**: Trail completo de mudanças
-
----
-
-## 🎯 Roadmap e Atualizações
-
-### ✅ **v2.0 (Atual)**
-- ✅ Interface moderna com abas
-- ✅ Cache inteligente implementado
-- ✅ Analytics dashboard completo
-- ✅ Integração Outlook aprimorada
-- ✅ Sistema de segurança robusto
-
-### 🚀 **v2.1 (Próxima)**
-- 📱 **App Mobile**: React Native
-- 🔔 **Notificações Push**: Firebase
-- 📊 **BI Integration**: Power BI connector
-- 🤖 **Chat Bot**: Assistente virtual
-
-### 🌟 **v3.0 (Futuro)**
-- 🧠 **AI/ML**: Predição de problemas
-- 🌐 **Multi-tenant**: Suporte múltiplas empresas
-- 📊 **Real-time**: WebSocket updates
-- ☁️ **Cloud Native**: Docker + Kubernetes
-
----
-
-## 📚 Documentação
-- Guias em `docs/` (instalação, deploy, segurança, Outlook Classic)
-- APIs: `public/api/analytics.php` e `public/api/counts.php`
-
----
-
-## 👨‍💻 Desenvolvimento
-- **GitHub**: [Du44rt3/ChamadoSystem](https://github.com/Du44rt3/ChamadoSystem)
-- **Issues**: Reporte bugs e sugestões
-- **Wiki**: Documentação técnica
-
-### 📚 **Recursos**
-- 📖 **Instalação**: `/docs/INSTALACAO_SISTEMA.md`
-- 🚀 **Deploy**: `/docs/DEPLOY_PRODUCAO_GUIA.md`
-- 🔒 **Segurança**: `/docs/CHECKLIST_SEGURANCA_PRODUCAO.md`
-
----
-
-<div align="center">
-
-**🏆 Sistema de Chamados e Facilities v2.0**
-
-*Sistema profissional desenvolvido para gestão de infraestrutura e tecnologia*
-
-[![Made with ❤️](https://img.shields.io/badge/Made%20with-❤️-red.svg)](https://github.com/Du44rt3/ChamadoSystem)
-[![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4.svg)](https://php.net)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1.svg)](https://mysql.com)
-
-**© 2025 Sistema de Chamados - Código aberto**
-
-</div>
