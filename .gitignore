@@ -57,3 +57,13 @@ public/*teste*.php
 public/*_backup.php
 *_backup.php
 *.bak
+
+# Arquivos temporários que sempre voltam (ignorar permanentemente)
+ESTRUTURA.md
+RELATORIO_TESTE_HTACCESS.md
+test_config.php
+test_logs.php
+tools/test_*.php
+tools/debug/redirect_diagnostic.php
+scripts/*_novo.ps1
+scripts/limpar_cache_hsts.bat
