@@ -1,0 +1,252 @@
+# ===================================================================
+# CONFIGURAÇÕES OTIMIZADAS PARA SISTEMA DE CHAMADOS ELUS
+# Configurações PHP via .htaccess (Seguro - não altera php.ini)
+# ===================================================================
+
+# ===================================================================
+# CONFIGURAÇÕES DE UPLOAD (Para sistema de anexos de imagens)
+# ===================================================================
+php_value upload_max_filesize 10M
+php_value post_max_size 50M
+php_value max_file_uploads 20
+php_flag file_uploads On
+
+# ===================================================================
+# CONFIGURAÇÕES DE PERFORMANCE (Para cache e analytics)
+# ===================================================================
+php_value memory_limit 256M
+php_value max_execution_time 300
+php_value max_input_time 300
+php_value max_input_vars 3000
+
+# ===================================================================
+# CONFIGURAÇÕES DE SEGURANÇA E AMBIENTE
+# ===================================================================
+
+# DESENVOLVIMENTO - Por pasta ou parâmetro
+<If "%{REQUEST_URI} =~ /chamados_system_dev/ || %{QUERY_STRING} =~ /dev=1/ || %{HTTP_HOST} =~ /:8080$/">
+    # Configurações para DESENVOLVIMENTO
+    php_flag display_errors On
+    php_flag log_errors On
+    php_value error_reporting "E_ALL"
+    php_flag expose_php On
+    php_value memory_limit 512M
+    php_value max_execution_time 0
+    
+    # Headers de desenvolvimento
+    Header always set X-Environment "development"
+    Header always set Cache-Control "no-cache, no-store, must-revalidate"
+</If>
+
+# PRODUÇÃO - Padrão para tudo que não for desenvolvimento
+<If "%{REQUEST_URI} !~ /chamados_system_dev/ && %{QUERY_STRING} !~ /dev=1/ && %{HTTP_HOST} !~ /:8080$/">
+    # Configurações para PRODUÇÃO
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_reporting "0"
+    php_flag expose_php Off
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    
+    # Headers de produção
+    Header always set X-Environment "production"
+    
+    # Forçar HTTPS em produção (DESATIVADO TEMPORARIAMENTE)
+    # Para reativar, descomente as 2 linhas abaixo:
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</If>
+
+# ===================================================================
+# CONFIGURAÇÕES DE SESSÃO (Por ambiente)
+# ===================================================================
+
+# DESENVOLVIMENTO - Sessões mais permissivas
+<If "%{REQUEST_URI} =~ /chamados_system_dev/ || %{QUERY_STRING} =~ /dev=1/ || %{HTTP_HOST} =~ /:8080$/">
+    php_flag session.cookie_httponly On
+    php_flag session.cookie_secure Off
+    php_value session.gc_maxlifetime 3600
+    php_value session.cookie_samesite "Lax"
+</If>
+
+# PRODUÇÃO - Sessões seguras
+<If "%{REQUEST_URI} !~ /chamados_system_dev/ && %{QUERY_STRING} !~ /dev=1/ && %{HTTP_HOST} !~ /:8080$/">
+    php_flag session.cookie_httponly On
+    # Cookies seguros HTTPS (DESATIVADO TEMPORARIAMENTE)
+    # Para reativar HTTPS, descomente a linha abaixo:
+    # php_flag session.cookie_secure On
+    php_flag session.cookie_secure Off
+    php_value session.gc_maxlifetime 1800
+    php_value session.cookie_samesite "Strict"
+    
+    # Configurações adicionais de segurança HTTPS (DESATIVADO TEMPORARIAMENTE)
+    # Para reativar HTTPS, descomente a linha abaixo:
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</If>
+
+# ===================================================================
+# PROTEÇÃO DE ARQUIVOS SENSÍVEIS
+# ===================================================================
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# ===================================================================
+# PROTEÇÃO DE DIRETÓRIOS
+# ===================================================================
+Options -Indexes
+
+# Bloquear acesso direto a diretórios críticos
+RedirectMatch 403 ^/chamados_system/(config|database|src|tools)/.*$
+
+# ===================================================================
+# OTIMIZAÇÕES DE CACHE E COMPRESSÃO (Por ambiente)
+# ===================================================================
+
+# DESENVOLVIMENTO - Cache desabilitado para facilitar debug
+<If "%{REQUEST_URI} =~ /chamados_system_dev/ || %{QUERY_STRING} =~ /dev=1/ || %{HTTP_HOST} =~ /:8080$/">
+    <IfModule mod_expires.c>
+        ExpiresActive Off
+    </IfModule>
+    
+    # Headers anti-cache para desenvolvimento
+    <IfModule mod_headers.c>
+        Header always set Cache-Control "no-cache, no-store, must-revalidate"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </IfModule>
+</If>
+
+# PRODUÇÃO - Cache otimizado
+<If "%{REQUEST_URI} !~ /chamados_system_dev/ && %{QUERY_STRING} !~ /dev=1/ && %{HTTP_HOST} !~ /:8080$/">
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresByType text/css "access plus 1 month"
+        ExpiresByType application/javascript "access plus 1 month"
+        ExpiresByType image/png "access plus 1 year"
+        ExpiresByType image/jpg "access plus 1 year"
+        ExpiresByType image/jpeg "access plus 1 year"
+        ExpiresByType image/gif "access plus 1 year"
+        ExpiresByType image/webp "access plus 1 year"
+    </IfModule>
+</If>
+
+# COMPRESSÃO (Para ambos os ambientes)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# ===================================================================
+# CONFIGURAÇÕES DE LOG (Por ambiente)
+# ===================================================================
+
+# DESENVOLVIMENTO - Logs detalhados
+<If "%{REQUEST_URI} =~ /chamados_system_dev/ || %{QUERY_STRING} =~ /dev=1/ || %{HTTP_HOST} =~ /:8080$/">
+    php_value error_log "logs/error_dev.log"
+    php_value log_errors_max_len "0"
+</If>
+
+# PRODUÇÃO - Logs otimizados
+<If "%{REQUEST_URI} !~ /chamados_system_dev/ && %{QUERY_STRING} !~ /dev=1/ && %{HTTP_HOST} !~ /:8080$/">
+    php_value error_log "logs/error_prod.log"
+    php_value log_errors_max_len "1024"
+</If>
+
+# ===================================================================
+# CONFIGURAÇÕES DE TIMEZONE
+# ===================================================================
+php_value date.timezone "America/Sao_Paulo"
+
+# ===================================================================
+# REWRITE RULES (Para URLs amigáveis se necessário)
+# ===================================================================
+RewriteEngine On
+
+# Redirecionar para pasta public se não estiver lá
+RewriteCond %{REQUEST_URI} !^/chamados_system/public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/$1 [L]
+
+# ===================================================================
+# HEADERS DE SEGURANÇA ADICIONAL
+# ===================================================================
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ===================================================================
+# COMO ALTERNAR ENTRE DESENVOLVIMENTO E PRODUÇÃO
+# ===================================================================
+# 
+# MÉTODO 1 - Por PASTA (Recomendado):
+# - PRODUÇÃO: localhost/chamados_system/public/
+# - DESENVOLVIMENTO: localhost/chamados_system_dev/public/
+# 
+# MÉTODO 2 - Por PARÂMETRO:
+# - PRODUÇÃO: localhost/chamados_system/public/
+# - DESENVOLVIMENTO: localhost/chamados_system/public/?dev=1
+# 
+# MÉTODO 3 - Por PORTA:
+# - PRODUÇÃO: localhost/chamados_system/public/
+# - DESENVOLVIMENTO: localhost:8080/chamados_system/public/
+# 
+# CONFIGURAÇÕES APLICADAS:
+# 
+# DESENVOLVIMENTO:
+# - Cache desabilitado (sempre carrega arquivos mais recentes)
+# - Erros exibidos na tela para debug
+# - Logs salvos em: logs/error_dev.log
+# - Headers incluem: X-Environment: development
+# - Memória: 512M, sem timeout de execução
+# - Sessões HTTP permitidas
+# 
+# PRODUÇÃO:
+# - Cache otimizado (1 mês CSS/JS, 1 ano imagens)
+# - Erros não exibidos (segurança)
+# - Logs salvos em: logs/error_prod.log
+# - Headers incluem: X-Environment: production
+# - Memória: 256M, timeout 300s
+# - Sessões apenas HTTPS
+# 
+# COMO TESTAR:
+# 1. HTTPS DESATIVADO: Use HTTP normalmente para desenvolvimento e produção
+# 2. HTTP: http://localhost/chamados_system/public/ (produção)
+# 3. HTTP: http://localhost/chamados_system_dev/public/ (desenvolvimento)
+# 4. Para ATIVAR HTTPS quando necessário:
+#    - Descomente linhas de redirecionamento HTTPS
+#    - Descomente session.cookie_secure
+#    - Descomente header Strict-Transport-Security
+#    - Execute: scripts/ativar_https_simples.bat
+# 5. Teste: tools/debug/https_test.php
+#
+# ATIVAÇÃO RÁPIDA HTTPS:
+# 1. Substitua "# RewriteCond" por "RewriteCond"
+# 2. Substitua "# RewriteRule" por "RewriteRule"  
+# 3. Substitua "# php_flag session.cookie_secure On" por "php_flag session.cookie_secure On"
+# 4. Remova linha "php_flag session.cookie_secure Off"
+# 5. Descomente header Strict-Transport-Security
+#
